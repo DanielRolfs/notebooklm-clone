@@ -31,7 +31,7 @@ export function StudioPanel({ onCollapse }: { onCollapse: () => void }) {
   return (
     <section className="flex min-h-0 flex-col rounded-3xl bg-panel p-4">
       <div className="mb-3 flex h-6 items-center justify-between">
-        <h2 className="text-[15px]">Studio</h2>
+        <h2>Studio</h2>
         <CollapseButton onClick={onCollapse} />
       </div>
       <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
@@ -42,7 +42,7 @@ export function StudioPanel({ onCollapse }: { onCollapse: () => void }) {
           </OutOfScope>
         ))}
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-[15px] text-foreground/60">
+      <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-foreground/60">
         <Icon name="pencil" className="mb-2 size-6" />
         <p className="font-medium text-foreground/80">Studio output will be saved here.</p>
         <p>After adding sources, click to add Audio Overview, Study Guide, Mind Map, and more!</p>
@@ -109,7 +109,7 @@ export function NoteEditor({
 
   return (
     <section className="flex min-h-0 flex-col rounded-3xl bg-panel p-4">
-      <div className="mb-2 flex h-6 items-center justify-between text-[15px]">
+      <div className="mb-2 flex h-6 items-center justify-between">
         <p className="flex items-center gap-1">
           <button onClick={onClose} className="rounded px-1 hover:bg-foreground/10">
             Studio
@@ -125,7 +125,7 @@ export function NoteEditor({
           onBlur={flush}
           aria-label="Note title"
           placeholder="New Note"
-          className="min-w-0 flex-1 bg-transparent text-2xl outline-none"
+          className="min-w-0 flex-1 bg-transparent text-2xl leading-8 outline-none"
         />
         <button onClick={onRemove} aria-label="Remove note" title="Remove note" className="rounded-full p-1.5 hover:bg-red-500/10">
           <Icon name="trash" className="size-5" />
@@ -138,7 +138,7 @@ export function NoteEditor({
         onBlur={flush}
         aria-label="Note text"
         placeholder="Write your note"
-        className="min-h-0 flex-1 resize-none px-1 py-2 text-[15px] outline-none"
+        className="min-h-0 flex-1 resize-none px-1 py-2 text-base outline-none"
       />
     </section>
   );

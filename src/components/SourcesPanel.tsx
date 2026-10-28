@@ -46,7 +46,7 @@ function RowMenu({ label, items }: { label: string; items: { text: string; icon:
       {open && (
         <>
           <button aria-label="Close menu" className="fixed inset-0 z-30 cursor-default" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-40 mt-1 w-48 rounded-2xl border border-foreground/10 bg-panel py-2 text-sm shadow-lg">
+          <div className="absolute right-0 top-full z-40 mt-1 w-48 rounded-2xl border border-foreground/10 bg-panel py-2 shadow-lg">
             {items.map((item) => (
               <button
                 key={item.text}
@@ -136,14 +136,14 @@ export function SourcesPanel({
       }}
     >
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-[15px]">Sources</h2>
+        <h2>Sources</h2>
         <OutOfScope className="!p-1" align="right" label="Collapse">
           <Icon name="panelLeft" className="size-4" />
         </OutOfScope>
       </div>
 
       {banner && (
-        <div className="mb-3 flex items-start gap-2 rounded-2xl bg-indigo-500/10 p-3 text-[13px]">
+        <div className="mb-3 flex items-start gap-2 rounded-2xl bg-indigo-500/10 p-3 text-xs">
           <span aria-hidden="true">📝</span>
           <p className="flex-1">
             <strong className="block font-medium">Meet the new notes!</strong>
@@ -158,13 +158,13 @@ export function SourcesPanel({
       <div className="mb-3 grid grid-cols-2 gap-2">
         <button
           onClick={() => setDialog(true)}
-          className="flex items-center justify-center gap-2 rounded-full bg-foreground/[0.06] py-3 text-[15px] hover:bg-foreground/10"
+          className="flex items-center justify-center gap-2 rounded-full bg-foreground/[0.06] py-3 font-medium hover:bg-foreground/10"
         >
           <Icon name="plus" className="size-4" /> Add sources
         </button>
         <button
           onClick={onCreateNote}
-          className="flex items-center justify-center gap-2 rounded-full bg-foreground/[0.06] py-3 text-[15px] hover:bg-foreground/10"
+          className="flex items-center justify-center gap-2 rounded-full bg-foreground/[0.06] py-3 font-medium hover:bg-foreground/10"
         >
           <Icon name="plus" className="size-4" /> Create note
         </button>
@@ -172,8 +172,8 @@ export function SourcesPanel({
 
       <Tooltip text="Not part of this clone's scope" block>
         <div aria-disabled="true" className="mb-3 w-full cursor-not-allowed rounded-3xl bg-foreground/[0.06] p-4 text-foreground/35">
-          <p className="mb-4 text-[15px]">Search the web for new sources</p>
-          <div className="flex items-center gap-2 text-[15px]">
+          <p className="mb-4">Search the web for new sources</p>
+          <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 rounded-full bg-panel px-3 py-1.5">
               <Icon name="globe" className="size-4" /> Web <Icon name="chevron" className="size-3.5" />
             </span>
@@ -189,7 +189,7 @@ export function SourcesPanel({
       {uploading && <p className="mb-2 text-xs text-foreground/60">Uploading...</p>}
 
       {sources.length === 0 && notes.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-[15px] text-foreground/60">
+        <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-foreground/60">
           <Icon name="doc" className="mb-2 size-6" />
           <p className="font-medium text-foreground/80">Saved sources will appear here</p>
           <p>Add files, websites, or more. Then ask questions or create things based on these sources.</p>
@@ -202,24 +202,23 @@ export function SourcesPanel({
         </div>
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <label className="mb-1 flex items-center justify-between px-1 text-[15px]">
+          <label className="flex h-9 items-center justify-between pl-2.5 pr-2">
             <Icon name="sort" className="size-4 text-foreground/60" />
-            <span className="flex items-center gap-3">
+            <span className="flex items-center">
               Select all
               <input
                 type="checkbox"
                 checked={ready.length > 0 && ready.every((s) => selected.has(s.id))}
                 disabled={ready.length === 0}
                 onChange={(e) => onToggleAll(e.target.checked)}
-                className="size-4"
               />
             </span>
           </label>
 
           {notes.length > 0 && (
             <div className="mb-1">
-              <div className="flex items-center pr-3">
-                <button onClick={() => setNotesOpen(!notesOpen)} className="flex flex-1 items-center gap-2 px-1 py-2 text-left text-[15px]">
+              <div className="flex h-9 items-center pr-2">
+                <button onClick={() => setNotesOpen(!notesOpen)} className="flex flex-1 items-center gap-2 pl-2 text-left">
                   <Icon name="chevron" className={`size-4 transition-transform ${notesOpen ? "" : "-rotate-90"}`} /> Notes
                 </button>
                 <input type="checkbox" checked disabled readOnly aria-label="Notes included" />
@@ -228,7 +227,7 @@ export function SourcesPanel({
                 notes.map((n) => (
                   <div
                     key={n.id}
-                    className={`flex items-center gap-2 rounded-xl px-3 py-2 ${n.id === openNoteId ? "bg-foreground/[0.07]" : "hover:bg-foreground/5"}`}
+                    className={`flex h-9 items-center gap-3.5 rounded-lg pl-2.5 pr-2 ${n.id === openNoteId ? "bg-foreground/[0.07]" : "hover:bg-foreground/5"}`}
                   >
                     <Icon name="note" className="size-5" />
                     {renamingId === n.id ? (
@@ -244,7 +243,7 @@ export function SourcesPanel({
                         onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
                       />
                     ) : (
-                      <button onClick={() => onOpenNote(n.id)} className="min-w-0 flex-1 truncate text-left text-[15px]">
+                      <button onClick={() => onOpenNote(n.id)} className="min-w-0 flex-1 truncate text-left">
                         {n.title}
                       </button>
                     )}
@@ -256,16 +255,16 @@ export function SourcesPanel({
                       ]}
                     />
                     {/* Notes are not chat context in this clone, so the box is shown ticked and inert. */}
-                    <input type="checkbox" checked disabled readOnly aria-label="Note included" className="size-4" />
+                    <input type="checkbox" checked disabled readOnly aria-label="Note included" />
                   </div>
                 ))}
             </div>
           )}
 
           {sources.map((s) => (
-            <div key={s.id} className="flex items-center gap-2 rounded-xl px-3 py-2 hover:bg-foreground/5">
+            <div key={s.id} className="flex h-9 items-center gap-3.5 rounded-lg pl-2.5 pr-2 hover:bg-foreground/5">
               <SourceIcon source={s} />
-              <span className="min-w-0 flex-1 truncate text-[15px]" title={s.title}>
+              <span className="min-w-0 flex-1 truncate" title={s.title}>
                 {s.title}
               </span>
               {s.status !== "ready" && <span className={`rounded px-1.5 py-0.5 text-xs ${badge[s.status]}`}>{s.status}</span>}
@@ -276,7 +275,6 @@ export function SourcesPanel({
                 checked={selected.has(s.id)}
                 disabled={s.status !== "ready"}
                 onChange={() => onToggle(s.id)}
-                className="size-4"
               />
             </div>
           ))}
