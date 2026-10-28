@@ -49,6 +49,32 @@ export function StudioPanel({ onCollapse }: { onCollapse: () => void }) {
   );
 }
 
+// Reference formatting toolbar: visible but inert (rich text is out of scope). "|" is a divider.
+const TOOLBAR: (IconName | "|" | "style")[] = [
+  "undo", "redo", "|", "style", "|", "bold", "italic", "|",
+  "link", "code", "codeBlock", "|", "bulletList", "numberList", "quote", "rule", "clearFormat",
+];
+
+function NoteToolbar() {
+  return (
+    <div className="mb-3 flex items-center gap-0.5 border-b border-foreground/10 px-1 py-3">
+      {TOOLBAR.map((item, i) =>
+        item === "|" ? (
+          <span key={i} className="mx-2 h-4 w-px bg-foreground/15" />
+        ) : item === "style" ? (
+          <OutOfScope key={item} label="Text style" className="!gap-1 !rounded !px-2 !py-1 text-[13px]">
+            Normal <Icon name="chevron" className="size-3" />
+          </OutOfScope>
+        ) : (
+          <OutOfScope key={item} label={item} className="!rounded !p-1.5">
+            <Icon name={item} className="size-4" />
+          </OutOfScope>
+        ),
+      )}
+    </div>
+  );
+}
+
 export function NoteEditor({
   note,
   onChange,
@@ -92,7 +118,7 @@ export function NoteEditor({
           <CollapseButton onClick={onCollapse} />
         </div>
       </div>
-      <div className="mb-3 flex items-center gap-2 border-b border-foreground/10 pb-3">
+      <div className="flex items-center gap-2 border-b border-foreground/10 pb-3">
         <input
           value={note.title}
           onChange={(e) => onChange({ title: e.target.value })}
@@ -101,10 +127,11 @@ export function NoteEditor({
           placeholder="New Note"
           className="min-w-0 flex-1 bg-transparent text-2xl outline-none"
         />
-        <button onClick={onRemove} className="flex items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-1.5 text-sm hover:bg-red-500/10">
-          <Icon name="trash" className="size-4" /> Remove
+        <button onClick={onRemove} aria-label="Remove note" title="Remove note" className="rounded-full p-2 hover:bg-red-500/10">
+          <Icon name="trash" className="size-5" />
         </button>
       </div>
+      <NoteToolbar />
       <textarea
         value={note.content}
         onChange={(e) => onChange({ content: e.target.value })}
