@@ -49,7 +49,7 @@ function SuggestionCards({ items, onAsk, disabled }: { items: string[]; onAsk: (
           className="flex min-h-32 flex-col justify-between gap-4 rounded-3xl bg-foreground/[0.06] p-5 text-left text-[15px] leading-6 hover:bg-foreground/10 disabled:opacity-50"
         >
           {q}
-          <Icon name="arrowRight" className="size-4" />
+          <Icon name="cornerDownRight" className="size-4" />
         </button>
       ))}
     </div>
@@ -125,7 +125,7 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
                     <Answer text={guide.summary} citations={[]} />
                   </p>
                   <div className="mt-5 flex items-center gap-1">
-                    <OutOfScope className="border border-foreground/10">
+                    <OutOfScope>
                       <Icon name="pin" className="size-4" /> Save to note
                     </OutOfScope>
                     <button onClick={() => copy(guide.summary.replaceAll("**", ""))} aria-label="Copy summary" className="rounded-full p-2 hover:bg-foreground/10">
@@ -201,7 +201,7 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
                 )}
                 {t.answer && !(busy && last) && (
                   <div className="mt-5 flex items-center gap-1">
-                    <OutOfScope className="border border-foreground/10">
+                    <OutOfScope>
                       <Icon name="pin" className="size-4" /> Save to note
                     </OutOfScope>
                     <button onClick={() => copy(t.answer)} aria-label="Copy answer" className="rounded-full p-2 hover:bg-foreground/10">

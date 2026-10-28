@@ -111,7 +111,7 @@ export function Workspace({
             aria-label="Expand panel"
             className="absolute left-1/2 top-4 hidden -translate-x-1/2 rounded-full p-1 text-foreground/60 hover:bg-foreground/10 lg:block"
           >
-            <Icon name="panel" className="size-4" />
+            <Icon name="panelRight" className="size-4" />
           </button>
         )}
         {/* Stays mounted when collapsed so an open note keeps its text and autosave. */}
