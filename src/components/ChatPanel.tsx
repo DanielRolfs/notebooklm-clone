@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createGuide, streamChat, type Citation } from "@/lib/api";
 import { sameIds, type Guide } from "@/lib/guide";
+import { DriveIcon } from "./BrandIcons";
 import { Icon } from "./Icons";
 import { OutOfScope, Tooltip } from "./Tooltip";
 
@@ -17,7 +18,7 @@ type Turn = {
   error?: string;
 };
 
-const starters = ["Summarize my sources", "What are the key points?", "What topics do the sources cover?"];
+const starters = ["Learn about a new topic", "Create something new", "Make progress on a project"];
 
 // Tiny renderer: **bold** and [n] Citations. Text goes through React, so no raw HTML is injected.
 function Answer({ text, citations }: { text: string; citations: Citation[] }) {
@@ -61,6 +62,7 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [driveHint, setDriveHint] = useState(true);
   const canSend = !busy && sourceIds.length > 0;
 
   // Guide: made once whenever the ready Sources differ from the stored guide. A failure is not
@@ -116,6 +118,11 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
             <article className="mb-10">
               {upToDate && guide ? (
                 <>
+                  {guide.emoji && (
+                    <div aria-hidden="true" className="mb-10 text-6xl">
+                      {guide.emoji}
+                    </div>
+                  )}
                   <h2 className="mb-3 text-4xl font-light leading-[44px]">{guide.title}</h2>
                   <p className="mb-6">
                     {guide.sourceIds.length} {guide.sourceIds.length === 1 ? "source" : "sources"} ·{" "}
@@ -166,8 +173,8 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
               <p className="mb-8 text-6xl">👋</p>
               <h2 className="mb-5 text-[28px] font-light leading-9">Let&apos;s start your notebook...</h2>
               <p className="mb-6 text-foreground/75">
-                This is your blank canvas to understand, create, or make progress on something new. Add your own sources, tick the
-                ones you want to use, and ask questions about them.
+                This is your blank canvas to understand, create, or make progress on something new. I can help you get started or you
+                can go ahead and add your own sources.
               </p>
               <p className="mb-3 font-medium">What would you like this notebook to help you do?</p>
               <div className="flex flex-col items-start gap-2">
@@ -225,12 +232,21 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
       </div>
 
       <div className="mx-auto w-full max-w-3xl px-4 pb-2">
+        {driveHint && (
+          <div className="mx-3 -mb-3 flex items-center gap-3 rounded-t-2xl bg-indigo-500/10 px-3 pb-5 pt-2 text-xs">
+            <DriveIcon className="size-5 shrink-0" />
+            <p className="flex-1">You can now search Google Drive files from chat. Try asking, &quot;search my Drive for...&quot;</p>
+            <button onClick={() => setDriveHint(false)} aria-label="Dismiss Drive hint" className="text-foreground/60">
+              <Icon name="close" className="size-4" />
+            </button>
+          </div>
+        )}
         <form
           onSubmit={(e) => {
             e.preventDefault();
             ask(input.trim());
           }}
-          className="flex items-center gap-3 rounded-full bg-panel px-4 py-2.5 shadow-sm"
+          className="relative flex items-center gap-3 rounded-full bg-panel px-4 py-2.5 shadow-sm"
         >
           <OutOfScope label="Chat settings" className="!p-1">
             <Icon name="tune" />
