@@ -36,7 +36,7 @@ npx tsc --noEmit
 npm run build
 ```
 
-Anonymous visitors are redirected to `/login`. After Google sign-in you land on the home page, which shows your email.
+Anonymous visitors on `/` are redirected to the public landing page at `/welcome`; every other route redirects to `/login`. After Google sign-in you land on the home page, which shows your email.
 
 ## Migrations
 
