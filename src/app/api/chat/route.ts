@@ -1,4 +1,5 @@
 import { chatGraph } from "@/lib/chat/graph";
+import { suggestFollowUps } from "@/lib/chat/suggest";
 import { citedNumbers, type RetrievedChunk } from "@/lib/chat/prompt";
 import { createClient } from "@/lib/supabase/server";
 
@@ -10,7 +11,7 @@ const SNIPPET_LENGTH = 240;
 const json = (body: unknown, status: number) => Response.json(body, { status });
 
 // Stream format: one JSON object per line. See the UI branch for the consumer.
-// {"type":"text","delta":string} | {"type":"citations","items":[...]} | {"type":"error","message":string}
+// {"type":"text","delta":string} | {"type":"citations","items":[...]} | {"type":"suggestions","items":[3 strings]} | {"type":"error","message":string}
 export async function POST(request: Request) {
   let body: { question?: unknown; sourceIds?: unknown };
   try {
@@ -91,6 +92,9 @@ export async function POST(request: Request) {
             snippet: c.content.slice(0, SNIPPET_LENGTH),
           }));
         send({ type: "citations", items });
+
+        const suggestions = await suggestFollowUps(question, final.answer ?? "", final.chunks ?? []);
+        if (suggestions.length > 0) send({ type: "suggestions", items: suggestions });
       } catch (e) {
         send({ type: "error", message: e instanceof Error ? e.message : "Chat failed." });
       } finally {

@@ -34,19 +34,23 @@ async function retrieve(state: typeof State.State, config?: RunnableConfig) {
   return { chunks: rows.map((r, i) => ({ n: i + 1, sourceId: r.source_id, content: r.content })) };
 }
 
+// streaming: true makes LangGraph's "messages" stream mode emit tokens.
+export function openRouterModel(model: string, streaming: boolean) {
+  return new ChatOpenAI({
+    model,
+    apiKey: requireEnv("OPENROUTER_API_KEY", process.env.OPENROUTER_API_KEY),
+    configuration: { baseURL: "https://openrouter.ai/api/v1" },
+    streaming,
+    temperature: 0,
+  });
+}
+
 async function generate(state: typeof State.State) {
   // No Chunks: skip the model call, it could only guess.
   if (state.chunks.length === 0) {
     return { answer: "I do not know. The selected Sources have no passages that match your question." };
   }
-  const model = new ChatOpenAI({
-    model: CHAT_MODEL,
-    apiKey: requireEnv("OPENROUTER_API_KEY", process.env.OPENROUTER_API_KEY),
-    configuration: { baseURL: "https://openrouter.ai/api/v1" },
-    streaming: true, // makes LangGraph's "messages" stream mode emit tokens
-    temperature: 0,
-  });
-  const res = await model.invoke([
+  const res = await openRouterModel(CHAT_MODEL, true).invoke([
     { role: "system", content: buildSystemPrompt(state.chunks) },
     { role: "user", content: state.question },
   ]);
