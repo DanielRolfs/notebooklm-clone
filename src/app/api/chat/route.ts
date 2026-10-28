@@ -70,7 +70,7 @@ export async function POST(request: Request) {
           if (mode === "messages") {
             const [msg, meta] = data;
             const delta = typeof msg.content === "string" ? msg.content : "";
-            if (meta?.langgraph_node === "answer" && delta) {
+            if (meta?.langgraph_node === "generate" && delta) {
               streamed = true;
               send({ type: "text", delta });
             }

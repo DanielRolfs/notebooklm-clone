@@ -34,7 +34,7 @@ async function retrieve(state: typeof State.State, config?: RunnableConfig) {
   return { chunks: rows.map((r, i) => ({ n: i + 1, sourceId: r.source_id, content: r.content })) };
 }
 
-async function answer(state: typeof State.State) {
+async function generate(state: typeof State.State) {
   // No Chunks: skip the model call, it could only guess.
   if (state.chunks.length === 0) {
     return { answer: "I do not know. The selected Sources have no passages that match your question." };
@@ -55,8 +55,8 @@ async function answer(state: typeof State.State) {
 
 export const chatGraph = new StateGraph(State)
   .addNode("retrieve", retrieve)
-  .addNode("answer", answer)
+  .addNode("generate", generate)
   .addEdge(START, "retrieve")
-  .addEdge("retrieve", "answer")
-  .addEdge("answer", END)
+  .addEdge("retrieve", "generate")
+  .addEdge("generate", END)
   .compile();
