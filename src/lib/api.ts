@@ -1,4 +1,5 @@
 // The HTTP contracts with the ingestion and chat servers live here, nowhere else.
+import type { Guide } from "@/lib/guide";
 
 export type Citation = { n: number; sourceId: string; sourceTitle: string; snippet: string };
 
@@ -72,4 +73,18 @@ export async function streamChat(
     lines.forEach(handle);
   }
   handle(buffer);
+}
+
+/**
+ * Contract: POST /api/guide. Body `{force?: boolean}`. Returns `{guide}` (null when there are no
+ * ready Sources) or `{error}`. Reuses the stored guide when the ready Sources are unchanged.
+ */
+export async function createGuide(force = false): Promise<Guide | null> {
+  const res = await fetch("/api/guide", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ force }),
+  });
+  if (!res.ok) throw new Error(await errorMessage(res));
+  return (await res.json()).guide as Guide | null;
 }

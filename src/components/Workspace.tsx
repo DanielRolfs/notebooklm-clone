@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Icon } from "./Icons";
 import { createClient } from "@/lib/supabase/client";
+import type { Guide } from "@/lib/guide";
 import { ChatPanel } from "./ChatPanel";
 import { SourcesPanel, type Note, type Source } from "./SourcesPanel";
 import { NoteEditor, StudioPanel } from "./StudioPanel";
@@ -13,10 +14,12 @@ export function Workspace({
   notebookId,
   sources,
   notes: initialNotes,
+  guide,
 }: {
   notebookId: string;
   sources: Source[];
   notes: Note[];
+  guide: Guide | null;
 }) {
   const [supabase] = useState(createClient);
   // Store the unticked ids: new ready Sources are then ticked by default without an effect.
@@ -26,6 +29,7 @@ export function Workspace({
   const [error, setError] = useState("");
   const [collapsed, setCollapsed] = useState(false);
   const selected = new Set(sources.filter((s) => s.status === "ready" && !unticked.has(s.id)).map((s) => s.id));
+  const readyIds = sources.filter((s) => s.status === "ready").map((s) => s.id).sort();
   const open = notes.find((n) => n.id === openId);
 
   const toggle = (id: string) =>
@@ -99,7 +103,7 @@ export function Workspace({
         }}
         onRemoveNote={removeNote}
       />
-      <ChatPanel sourceIds={[...selected]} />
+      <ChatPanel sourceIds={[...selected]} readyIds={readyIds} guide={guide} />
       <div className="relative min-h-0 lg:overflow-hidden">
         {collapsed && (
           <button

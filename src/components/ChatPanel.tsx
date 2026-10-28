@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { streamChat, type Citation } from "@/lib/api";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createGuide, streamChat, type Citation } from "@/lib/api";
+import { sameIds, type Guide } from "@/lib/guide";
 import { Icon } from "./Icons";
 import { OutOfScope, Tooltip } from "./Tooltip";
 
@@ -36,11 +38,52 @@ function Answer({ text, citations }: { text: string; citations: Citation[] }) {
   );
 }
 
-export function ChatPanel({ sourceIds }: { sourceIds: string[] }) {
+function SuggestionCards({ items, onAsk, disabled }: { items: string[]; onAsk: (q: string) => void; disabled: boolean }) {
+  return (
+    <div className="mt-8 grid gap-3 sm:grid-cols-3">
+      {items.map((q) => (
+        <button
+          key={q}
+          onClick={() => onAsk(q)}
+          disabled={disabled}
+          className="flex min-h-32 flex-col justify-between gap-4 rounded-3xl bg-foreground/[0.06] p-5 text-left text-[15px] leading-6 hover:bg-foreground/10 disabled:opacity-50"
+        >
+          {q}
+          <Icon name="arrowRight" className="size-4" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// sourceIds: the ticked Sources (chat scope). readyIds: all ready Sources (what the guide covers), sorted.
+export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[]; readyIds: string[]; guide: Guide | null }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const canSend = !busy && sourceIds.length > 0;
+
+  // Guide: made once whenever the ready Sources differ from the stored guide. A failure is not
+  // retried automatically; the "Try again" button bumps `attempt` instead.
+  const router = useRouter();
+  const inFlight = useRef(false);
+  const [attempt, setAttempt] = useState(0);
+  const [failed, setFailed] = useState<{ key: string; message: string } | null>(null);
+  const readyKey = readyIds.join(",");
+  const upToDate = readyIds.length > 0 ? !!guide && sameIds(guide.sourceIds, readyIds) : !guide;
+  const failure = failed?.key === readyKey ? failed.message : "";
+
+  useEffect(() => {
+    if (upToDate || failure || inFlight.current) return;
+    inFlight.current = true;
+    createGuide()
+      .then(() => router.refresh())
+      .catch((err) => setFailed({ key: readyKey, message: err instanceof Error ? err.message : "Could not create the summary." }))
+      .finally(() => {
+        inFlight.current = false;
+        setAttempt((n) => n + 1); // re-check: the Sources may have changed meanwhile
+      });
+  }, [upToDate, failure, readyKey, attempt, router]);
 
   // Always updates the last turn, which is the one being streamed.
   const patchLast = (fn: (t: Turn) => Turn) => setTurns((ts) => ts.map((t, i) => (i === ts.length - 1 ? fn(t) : t)));
@@ -69,7 +112,56 @@ export function ChatPanel({ sourceIds }: { sourceIds: string[] }) {
     <section className="flex min-h-0 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4">
         <div className="mx-auto max-w-3xl pb-6 pt-4">
-          {turns.length === 0 && (
+          {readyIds.length > 0 && (
+            <article className="mb-10">
+              {upToDate && guide ? (
+                <>
+                  <h2 className="mb-3 text-3xl font-light leading-tight">{guide.title}</h2>
+                  <p className="mb-6 text-sm">
+                    {guide.sourceIds.length} {guide.sourceIds.length === 1 ? "source" : "sources"} ·{" "}
+                    {new Date(guide.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                  <p className="text-[15px] leading-7 text-foreground/85">
+                    <Answer text={guide.summary} citations={[]} />
+                  </p>
+                  <div className="mt-5 flex items-center gap-1">
+                    <OutOfScope className="border border-foreground/10">
+                      <Icon name="pin" className="size-4" /> Save to note
+                    </OutOfScope>
+                    <button onClick={() => copy(guide.summary.replaceAll("**", ""))} aria-label="Copy summary" className="rounded-full p-2 hover:bg-foreground/10">
+                      <Icon name="copy" className="size-4" />
+                    </button>
+                    <OutOfScope label="Good answer" className="!p-2">
+                      <Icon name="thumb" className="size-4" />
+                    </OutOfScope>
+                    <OutOfScope label="Bad answer" className="!p-2">
+                      <Icon name="thumb" className="size-4 rotate-180" />
+                    </OutOfScope>
+                  </div>
+                  <SuggestionCards items={guide.suggestions} onAsk={ask} disabled={!canSend} />
+                </>
+              ) : failure ? (
+                <p role="alert" className="flex flex-wrap items-center gap-3 rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+                  Could not create the summary: {failure}
+                  <button onClick={() => { setFailed(null); setAttempt((n) => n + 1); }} className="rounded-full border border-current px-3 py-1">
+                    Try again
+                  </button>
+                </p>
+              ) : (
+                <div aria-live="polite" className="animate-pulse">
+                  <p className="mb-4 text-sm text-foreground/60">Creating summary...</p>
+                  <div className="mb-3 h-8 w-2/3 rounded-lg bg-foreground/10" />
+                  <div className="space-y-2">
+                    <div className="h-4 rounded bg-foreground/10" />
+                    <div className="h-4 rounded bg-foreground/10" />
+                    <div className="h-4 w-4/5 rounded bg-foreground/10" />
+                  </div>
+                </div>
+              )}
+            </article>
+          )}
+
+          {turns.length === 0 && readyIds.length === 0 && (
             <div className="pt-6">
               <p className="mb-8 text-6xl">👋</p>
               <h2 className="mb-5 text-4xl font-light">Let&apos;s start your notebook...</h2>
@@ -122,19 +214,7 @@ export function ChatPanel({ sourceIds }: { sourceIds: string[] }) {
                   </div>
                 )}
                 {last && !busy && t.suggestions.length > 0 && (
-                  <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                    {t.suggestions.map((q) => (
-                      <button
-                        key={q}
-                        onClick={() => ask(q)}
-                        disabled={!canSend}
-                        className="flex min-h-32 flex-col justify-between gap-4 rounded-3xl bg-foreground/[0.06] p-5 text-left text-[15px] leading-6 hover:bg-foreground/10 disabled:opacity-50"
-                      >
-                        {q}
-                        <Icon name="arrowRight" className="size-4" />
-                      </button>
-                    ))}
-                  </div>
+                  <SuggestionCards items={t.suggestions} onAsk={ask} disabled={!canSend} />
                 )}
               </article>
             );

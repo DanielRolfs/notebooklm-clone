@@ -5,7 +5,7 @@ import { signOut } from "@/app/actions";
 import { Icon } from "./Icons";
 import { OutOfScope } from "./Tooltip";
 
-export function Header({ email }: { email?: string }) {
+export function Header({ email, title }: { email?: string; title?: string }) {
   const [menu, setMenu] = useState(false);
   const initial = (email?.[0] ?? "?").toUpperCase();
 
@@ -16,7 +16,7 @@ export function Header({ email }: { email?: string }) {
           <path d="M5 26V16a11 11 0 0122 0v10" stroke="#4285f4" />
           <path d="M11 26V16a5 5 0 0110 0v10" stroke="#a78bfa" />
         </svg>
-        <span className="text-[22px]">Untitled notebook</span>
+        <span className="text-[22px]">{title || "Untitled notebook"}</span>
       </div>
       <div className="flex items-center gap-1">
         <OutOfScope className="border border-foreground/15" align="right">
