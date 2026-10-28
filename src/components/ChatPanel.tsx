@@ -184,8 +184,10 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
             const last = i === turns.length - 1;
             return (
               <article key={i} className="mb-10">
-                <h2 className="mb-3 text-4xl font-light leading-tight">{t.question}</h2>
-                <p className="mb-6 text-sm">
+                <div className="mb-2 flex justify-end">
+                  <h2 className="max-w-[85%] whitespace-pre-wrap rounded-3xl bg-foreground/[0.06] px-5 py-3 text-base leading-7">{t.question}</h2>
+                </div>
+                <p className="mb-5 text-right text-xs text-foreground/50">
                   {t.sourceCount} {t.sourceCount === 1 ? "source" : "sources"} · {t.date}
                 </p>
                 <p className="whitespace-pre-wrap text-base leading-7 text-foreground/85">
