@@ -1,6 +1,5 @@
-import { signOut } from "./actions";
 import { createClient } from "@/lib/supabase/server";
-import { OutOfScope } from "@/components/Tooltip";
+import { Header } from "@/components/Header";
 import { Workspace } from "@/components/Workspace";
 
 export default async function HomePage() {
@@ -17,20 +16,8 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="flex h-screen flex-col">
-      <header className="flex items-center justify-between border-b border-foreground/10 px-4 py-2">
-        <h1 className="font-semibold">Your Notebook</h1>
-        <div className="flex items-center gap-2">
-          <OutOfScope>Share</OutOfScope>
-          <OutOfScope>Settings</OutOfScope>
-          <span className="ml-2 text-sm text-foreground/70">{email}</span>
-          <form action={signOut}>
-            <button className="rounded-md border border-foreground/20 px-3 py-1.5 text-sm hover:bg-foreground/5">
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
+    <div className="flex h-screen flex-col bg-page">
+      <Header email={email} />
       {notebook ? (
         <Workspace notebookId={notebook.id} sources={sources ?? []} notes={notes ?? []} />
       ) : (
