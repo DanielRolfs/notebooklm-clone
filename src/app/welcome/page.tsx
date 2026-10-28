@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
-import Link from "next/link";
 import { FlowChips, FlowDiagram } from "./flow-diagram";
 import { LogoMark } from "./logo-mark";
 
@@ -26,7 +25,7 @@ export default function WelcomePage() {
           <LogoMark className="h-[22px] w-[30px]" />
           NotebookLM Clone
         </div>
-        <Link href="/login" className={`${pill} flex h-9 items-center px-6 text-[15px]`}>Sign in</Link>
+        <a href="/auth/google" className={`${pill} flex h-9 items-center px-6 text-[15px]`}>Sign in</a>
       </header>
 
       <main className="relative flex min-h-screen flex-col lg:block">
@@ -45,16 +44,16 @@ export default function WelcomePage() {
           <p className="mx-auto mt-5 max-w-[26em] text-base leading-6 text-[#70757a] lg:mx-0 lg:mt-6 lg:max-w-[420px] lg:text-[28px] lg:leading-9">
             Your assistant for research and reasoning, based on the sources you trust: your own files, links and notes, with cited answers you can check.
           </p>
-          <Link href="/login" className={`${pill} mt-8 inline-flex h-[52px] items-center px-8 text-[17px] font-medium lg:mt-[37px]`}>
+          <a href="/auth/google" className={`${pill} mt-8 inline-flex h-[52px] items-center px-8 text-[17px] font-medium lg:mt-[37px]`}>
             Sign in to NotebookLM Clone
-          </Link>
+          </a>
         </section>
       </main>
 
       <footer className="absolute bottom-[26px] left-5 z-10 flex items-center gap-[30px] text-[13px] text-[#6b6e73] sm:left-12">
         <span className="text-base font-medium tracking-[-0.01em] text-[#3c4043]">NotebookLM Clone</span>
         <span>A demo project</span>
-        <Link href="/login" className="underline underline-offset-2 hover:text-[#0b0b0b]">Sign in</Link>
+        <a href="/auth/google" className="underline underline-offset-2 hover:text-[#0b0b0b]">Sign in</a>
       </footer>
     </div>
   );
