@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Figtree } from "next/font/google";
 import { FlowChips, FlowDiagram } from "./flow-diagram";
 import { LogoMark } from "./logo-mark";
 
@@ -8,14 +7,11 @@ export const metadata: Metadata = {
   description: "An assistant that answers questions from the sources you trust, with cited answers.",
 };
 
-// Geometric sans close to the reference's typeface.
-const font = Figtree({ subsets: ["latin"], weight: ["400", "500"] });
-
 const pill = "rounded-full bg-[#9dd2ff] text-[#0b1b33] transition-colors hover:bg-[#86c5fb]";
 
 export default function WelcomePage() {
   return (
-    <div className={`${font.className} relative min-h-screen overflow-hidden bg-[#faf9f9] text-[#0b0b0b]`}>
+    <div className="relative min-h-screen overflow-hidden bg-[#faf9f9] text-[#0b0b0b]">
       {/* soft glow in the bottom corners */}
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_42%_24%_at_0%_100%,rgba(215,228,253,0.95),transparent),radial-gradient(ellipse_36%_24%_at_100%_100%,rgba(214,227,253,0.95),transparent)]" />
 

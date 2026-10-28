@@ -5,6 +5,7 @@
   --foreground: #171717;
   --page: #f4f4f5;
   --panel: #ffffff;
+  --ink: #1f1f1f;
 }
 
 @theme inline {
@@ -20,6 +21,7 @@
     --foreground: #ededed;
     --page: #0a0a0a;
     --panel: #1a1a1a;
+    --ink: #ededed;
   }
 }
 
@@ -43,35 +45,46 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-app), Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 24px;
 }
 
-/* Dark rounded-square checkboxes with a check mark, instead of the browser's blue default. */
+/* Checkboxes like the reference: a 32px click target around a 14px outlined box (2px border, 3px radius)
+   with a 2px check inside. The box and the check are drawn by pseudo-elements, so the native input stays. */
 input[type="checkbox"] {
   appearance: none;
   display: inline-grid;
-  place-content: center;
+  place-items: center;
   flex-shrink: 0;
-  width: 1.125rem;
-  height: 1.125rem;
-  border: 2px solid var(--foreground);
-  border-radius: 0.25rem;
-  background: transparent;
+  width: 32px;
+  height: 32px;
+  margin: 0;
   cursor: pointer;
 }
-input[type="checkbox"]:checked {
-  background: var(--foreground);
+input[type="checkbox"]::before,
+input[type="checkbox"]::after {
+  content: "";
+  grid-area: 1 / 1;
+}
+input[type="checkbox"]::before {
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
 }
 input[type="checkbox"]:checked::after {
-  content: "";
-  width: 0.3rem;
-  height: 0.55rem;
-  margin-top: -0.1rem;
-  border: solid var(--background);
+  width: 3px;
+  height: 6px;
+  margin-top: -2px;
+  border: solid var(--ink);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 input[type="checkbox"]:disabled {
-  opacity: 0.6;
   cursor: not-allowed;
+}
+input[type="checkbox"]:disabled:not(:checked) {
+  opacity: 0.4;
 }

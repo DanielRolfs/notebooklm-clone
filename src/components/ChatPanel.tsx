@@ -46,10 +46,10 @@ function SuggestionCards({ items, onAsk, disabled }: { items: string[]; onAsk: (
           key={q}
           onClick={() => onAsk(q)}
           disabled={disabled}
-          className="flex min-h-32 flex-col justify-between gap-4 rounded-3xl bg-foreground/[0.06] p-5 text-left text-[15px] leading-6 hover:bg-foreground/10 disabled:opacity-50"
+          className="flex min-h-32 flex-col justify-between gap-4 rounded-3xl bg-foreground/[0.06] p-5 text-left hover:bg-foreground/10 disabled:opacity-50"
         >
           {q}
-          <Icon name="arrowRight" className="size-4" />
+          <Icon name="cornerDownRight" className="size-4" />
         </button>
       ))}
     </div>
@@ -116,16 +116,16 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
             <article className="mb-10">
               {upToDate && guide ? (
                 <>
-                  <h2 className="mb-3 text-3xl font-light leading-tight">{guide.title}</h2>
-                  <p className="mb-6 text-sm">
+                  <h2 className="mb-3 text-4xl font-light leading-[44px]">{guide.title}</h2>
+                  <p className="mb-6">
                     {guide.sourceIds.length} {guide.sourceIds.length === 1 ? "source" : "sources"} ·{" "}
                     {new Date(guide.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </p>
-                  <p className="text-[15px] leading-7 text-foreground/85">
+                  <p className="text-base text-foreground/85">
                     <Answer text={guide.summary} citations={[]} />
                   </p>
                   <div className="mt-5 flex items-center gap-1">
-                    <OutOfScope className="border border-foreground/10">
+                    <OutOfScope>
                       <Icon name="pin" className="size-4" /> Save to note
                     </OutOfScope>
                     <button onClick={() => copy(guide.summary.replaceAll("**", ""))} aria-label="Copy summary" className="rounded-full p-2 hover:bg-foreground/10">
@@ -164,15 +164,15 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
           {turns.length === 0 && readyIds.length === 0 && (
             <div className="pt-6">
               <p className="mb-8 text-6xl">👋</p>
-              <h2 className="mb-5 text-4xl font-light">Let&apos;s start your notebook...</h2>
-              <p className="mb-6 text-base leading-7 text-foreground/75">
+              <h2 className="mb-5 text-[28px] font-light leading-9">Let&apos;s start your notebook...</h2>
+              <p className="mb-6 text-foreground/75">
                 This is your blank canvas to understand, create, or make progress on something new. Add your own sources, tick the
                 ones you want to use, and ask questions about them.
               </p>
-              <p className="mb-3 text-[15px] font-medium">What would you like this notebook to help you do?</p>
+              <p className="mb-3 font-medium">What would you like this notebook to help you do?</p>
               <div className="flex flex-col items-start gap-2">
                 {starters.map((s) => (
-                  <button key={s} onClick={() => setInput(s)} className="rounded-full bg-foreground/[0.06] px-4 py-2.5 text-[15px] hover:bg-foreground/10">
+                  <button key={s} onClick={() => setInput(s)} className="rounded-full bg-foreground/[0.06] px-4 py-2 text-[13px] hover:bg-foreground/10">
                     {s}
                   </button>
                 ))}
@@ -185,12 +185,12 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
             return (
               <article key={i} className="mb-10">
                 <div className="mb-2 flex justify-end">
-                  <h2 className="max-w-[85%] whitespace-pre-wrap rounded-3xl bg-foreground/[0.06] px-5 py-3 text-base leading-7">{t.question}</h2>
+                  <h2 className="max-w-[85%] whitespace-pre-wrap rounded-3xl bg-foreground/[0.06] px-5 py-3 text-base">{t.question}</h2>
                 </div>
                 <p className="mb-5 text-right text-xs text-foreground/50">
                   {t.sourceCount} {t.sourceCount === 1 ? "source" : "sources"} · {t.date}
                 </p>
-                <p className="whitespace-pre-wrap text-base leading-7 text-foreground/85">
+                <p className="whitespace-pre-wrap text-base text-foreground/85">
                   <Answer text={t.answer} citations={t.citations} />
                   {busy && last && !t.error && <span className="animate-pulse"> ...</span>}
                 </p>
@@ -201,7 +201,7 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
                 )}
                 {t.answer && !(busy && last) && (
                   <div className="mt-5 flex items-center gap-1">
-                    <OutOfScope className="border border-foreground/10">
+                    <OutOfScope>
                       <Icon name="pin" className="size-4" /> Save to note
                     </OutOfScope>
                     <button onClick={() => copy(t.answer)} aria-label="Copy answer" className="rounded-full p-2 hover:bg-foreground/10">
@@ -241,7 +241,7 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
             placeholder="Ask a question or create something"
             className="min-w-0 flex-1 bg-transparent py-2 text-base outline-none"
           />
-          <span className="text-[15px] text-foreground/60">
+          <span className="text-[13px] text-foreground/60">
             {sourceIds.length} {sourceIds.length === 1 ? "source" : "sources"}
           </span>
           <button

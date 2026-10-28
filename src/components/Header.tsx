@@ -19,7 +19,7 @@ export function Header({ email, title }: { email?: string; title?: string }) {
         <span className="text-[22px]">{title || "Untitled notebook"}</span>
       </div>
       <div className="flex items-center gap-1">
-        <OutOfScope className="border border-foreground/15" align="right">
+        <OutOfScope align="right">
           <Icon name="plus" className="size-4" /> Create notebook
         </OutOfScope>
         <OutOfScope align="right">

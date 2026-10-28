@@ -45,7 +45,7 @@ export function OutOfScope({
         type="button"
         aria-disabled="true"
         aria-label={label}
-        className={`inline-flex cursor-not-allowed items-center gap-2 rounded-full px-3 py-1.5 text-sm text-foreground/35 ${className}`}
+        className={`inline-flex cursor-not-allowed items-center gap-2 rounded-full px-3 py-1.5 text-foreground/35 ${className}`}
       >
         {children}
       </button>

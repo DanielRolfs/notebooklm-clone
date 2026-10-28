@@ -5,23 +5,24 @@ import { Icon, type IconName } from "./Icons";
 import { OutOfScope } from "./Tooltip";
 import type { Note } from "./SourcesPanel";
 
-const tools: [string, IconName][] = [
-  ["Audio Overview", "audio"],
-  ["Slide Deck", "slides"],
-  ["Video Overview", "video"],
-  ["Mind Map", "mindmap"],
-  ["Reports", "doc"],
-  ["Flashcards", "slides"],
-  ["Quiz", "quiz"],
-  ["Infographic", "chart"],
-  ["Data Table", "table"],
+// Label, icon and icon color of the reference tiles; the faded icons keep their hue.
+const tools: [string, IconName, string][] = [
+  ["Audio Overview", "audio", "text-blue-600"],
+  ["Slide Deck", "slides", "text-pink-600"],
+  ["Video Overview", "video", "text-green-600"],
+  ["Mind Map", "mindmap", "text-purple-600"],
+  ["Reports", "reports", "text-pink-600"],
+  ["Flashcards", "flashcards", "text-orange-500"],
+  ["Quiz", "quiz", "text-teal-700"],
+  ["Infographic", "chart", "text-orange-500"],
+  ["Data Table", "table", "text-blue-600"],
 ];
 
 // Folds the right column in; hidden on small screens where the columns are stacked.
-function CollapseButton({ onClick }: { onClick: () => void }) {
+function CollapseButton({ onClick, icon = "panelRight" }: { onClick: () => void; icon?: IconName }) {
   return (
     <button onClick={onClick} aria-label="Collapse panel" className="hidden rounded-full p-1 text-foreground/60 hover:bg-foreground/10 lg:block">
-      <Icon name="panel" className="size-4" />
+      <Icon name={icon} className="size-4" />
     </button>
   );
 }
@@ -30,17 +31,18 @@ export function StudioPanel({ onCollapse }: { onCollapse: () => void }) {
   return (
     <section className="flex min-h-0 flex-col rounded-3xl bg-panel p-4">
       <div className="mb-3 flex h-6 items-center justify-between">
-        <h2 className="text-[15px]">Studio</h2>
+        <h2>Studio</h2>
         <CollapseButton onClick={onCollapse} />
       </div>
       <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
-        {tools.map(([name, icon]) => (
-          <OutOfScope key={name} block className="h-11 w-full !justify-start !rounded-xl border border-foreground/10 !px-2 !py-0 text-[13px] whitespace-nowrap">
-            <Icon name={icon} className="size-4" /> {name}
+        {tools.map(([name, icon, color]) => (
+          <OutOfScope key={name} block className="h-12 w-full !justify-start !gap-3 border border-foreground/10 !px-3 !py-0 text-[13px] whitespace-nowrap">
+            <Icon name={icon} className={`size-5 opacity-60 ${color}`} /> {name}
+            {name === "Reports" && <span className="ml-auto rounded-full bg-foreground/10 px-2 py-0.5 text-xs">New!</span>}
           </OutOfScope>
         ))}
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-[15px] text-foreground/60">
+      <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-foreground/60">
         <Icon name="pencil" className="mb-2 size-6" />
         <p className="font-medium text-foreground/80">Studio output will be saved here.</p>
         <p>After adding sources, click to add Audio Overview, Study Guide, Mind Map, and more!</p>
@@ -107,16 +109,14 @@ export function NoteEditor({
 
   return (
     <section className="flex min-h-0 flex-col rounded-3xl bg-panel p-4">
-      <div className="mb-2 flex h-6 items-center justify-between text-[15px]">
-        <p>
-          <span className="text-foreground/60">Studio</span> <span className="text-foreground/40">›</span> Note
-        </p>
-        <div className="flex items-center gap-1">
-          <button onClick={onClose} aria-label="Close note" className="rounded-full p-1 text-foreground/60 hover:bg-foreground/10">
-            <Icon name="close" className="size-4" />
+      <div className="mb-2 flex h-6 items-center justify-between">
+        <p className="flex items-center gap-1">
+          <button onClick={onClose} className="rounded px-1 hover:bg-foreground/10">
+            Studio
           </button>
-          <CollapseButton onClick={onCollapse} />
-        </div>
+          <Icon name="chevronRight" className="size-4 text-foreground/60" /> Note
+        </p>
+        <CollapseButton onClick={onCollapse} icon="shrink" />
       </div>
       <div className="flex items-center gap-2 border-b border-foreground/10 pb-2">
         <input
@@ -125,7 +125,7 @@ export function NoteEditor({
           onBlur={flush}
           aria-label="Note title"
           placeholder="New Note"
-          className="min-w-0 flex-1 bg-transparent text-2xl outline-none"
+          className="min-w-0 flex-1 bg-transparent text-2xl leading-8 outline-none"
         />
         <button onClick={onRemove} aria-label="Remove note" title="Remove note" className="rounded-full p-1.5 hover:bg-red-500/10">
           <Icon name="trash" className="size-5" />
@@ -138,7 +138,7 @@ export function NoteEditor({
         onBlur={flush}
         aria-label="Note text"
         placeholder="Write your note"
-        className="min-h-0 flex-1 resize-none px-1 py-2 text-[15px] outline-none"
+        className="min-h-0 flex-1 resize-none px-1 py-2 text-base outline-none"
       />
     </section>
   );
