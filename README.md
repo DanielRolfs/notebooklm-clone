@@ -40,9 +40,12 @@ The first three rows are the steps and estimates from my [initial analysis](init
 | 3. Improve the initial analysis | 5 min |
 | 4. Grill with Docs (Matt Pocock skill) | 30 min |
 | 5. Build, review and deploy with AI agents | about 2 h 30 min |
-| **Total** | **about 3 h 45 min** |
+| 6. Test and fix | about 1 h 15 min |
+| **Total** | **about 5 h** |
 
 Step 5 is wall-clock time from the first commit of the build (15:19) to the last feature merge (about 17:20) plus writing these docs. A manager session handed out the work, subagents built the branches in parallel, and I tested every pull request on its Vercel preview before it was merged: 15 pull requests (this documentation one included), 14 merged and one closed (website and YouTube import). My own hands-on time was lower, because the agents worked while I tested.
+
+Step 6 is wall-clock time from the README update that added step 5 (17:28) to the end of the match-the-screenshots pass (about 18:45). It covers the UI parity and font fixes, the responsive panels, the Playwright tests (logged-out, signed-in and layout) and a click-through of the whole app against the six screenshots. That pass added the missing controls, for example the title, search box, Play Books and Drive chips in the Add sources popover, the grayed-out Export to Docs item, the Drive hint above the chat box, and the emoji above the guide title.
 
 ## Setup
 
