@@ -335,14 +335,10 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
           >
             <Icon name="upload" className="size-4" /> Upload files
           </button>
-          <Tooltip text="Coming in a later step">
+          <Tooltip text="Not part of this clone's scope">
             <button disabled className={`${chip(false)} cursor-not-allowed opacity-40`}>
-              <Icon name="link" className="size-4" /> Websites
-            </button>
-          </Tooltip>
-          <Tooltip text="Coming in a later step">
-            <button disabled className={`${chip(false)} cursor-not-allowed opacity-40`}>
-              <Icon name="play" className="size-4 text-red-600" /> YouTube
+              <Icon name="link" className="size-4" />
+              <Icon name="play" className="size-4 text-red-600" /> Websites
             </button>
           </Tooltip>
           <button className={chip(mode === "text")} onClick={() => setMode("text")}>
