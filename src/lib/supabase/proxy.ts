@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseEnv } from "@/lib/env";
 
-const PUBLIC_PATHS = ["/login", "/auth"];
+const PUBLIC_PATHS = ["/login", "/auth", "/welcome"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -25,11 +25,13 @@ export async function updateSession(request: NextRequest) {
 
   // getClaims validates the JWT and refreshes the session if it is near expiry.
   const { data } = await supabase.auth.getClaims();
-  const isPublic = PUBLIC_PATHS.some((p) => request.nextUrl.pathname.startsWith(p));
+  const path = request.nextUrl.pathname;
+  const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
 
   if (!data?.claims && !isPublic) {
     const redirect = request.nextUrl.clone();
-    redirect.pathname = "/login";
+    // Visitors on the bare root see the landing page, everything else needs a login.
+    redirect.pathname = path === "/" ? "/welcome" : "/login";
     redirect.search = "";
     return NextResponse.redirect(redirect);
   }
