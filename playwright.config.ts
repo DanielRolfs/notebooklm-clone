@@ -8,6 +8,7 @@ export default defineConfig({
   timeout: 120_000,
   expect: { timeout: 15_000 },
   workers: 1,
+  preserveOutput: "always", // keep the layout screenshots of passing tests too
   retries: 0,
   reporter: [["list"], ["html", { open: "never" }]],
   globalSetup: "./e2e/global-setup.ts",
@@ -23,6 +24,6 @@ export default defineConfig({
     : { command: "npm run dev", url: "http://localhost:3000", reuseExistingServer: true, timeout: 120_000 },
   projects: [
     { name: "public", testMatch: "public.spec.ts" },
-    { name: "signed-in", testMatch: "app.spec.ts", use: { storageState: "e2e/.auth/state.json" } },
+    { name: "signed-in", testMatch: ["app.spec.ts", "layout.spec.ts"], use: { storageState: "e2e/.auth/state.json" } },
   ],
 });
