@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code local files and agent worktrees
+.claude/worktrees/
+.claude/settings.local.json

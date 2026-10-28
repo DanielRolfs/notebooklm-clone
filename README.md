@@ -14,6 +14,19 @@ Stack: Next.js (App Router, TypeScript, Tailwind), Supabase (Auth, Postgres, pgv
 4. Copy the env template and fill it in: `cp .env.example .env.local`
 5. Apply the database migration (below).
 
+### Environment variables
+
+`.env.local` stays on your machine and is git-ignored. `.env.example` is the template and lists where to find each value.
+
+| Variable | Where to get it | Secret |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase: Project Settings, API | No |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase: Project Settings, API Keys (publishable / anon) | No |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase: Project Settings, API Keys (secret / service_role) | Yes, server only |
+| `OPENROUTER_API_KEY` | openrouter.ai, Keys (add a few dollars of credit) | Yes, server only |
+
+Google login also needs an OAuth client from Google Cloud Console. Use the callback URL shown under Supabase, Authentication, Providers, Google, then paste the client ID and secret there.
+
 ## Run
 
 ```bash
