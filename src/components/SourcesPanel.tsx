@@ -117,7 +117,7 @@ export function SourcesPanel({
 
   return (
     <section
-      className="flex min-h-0 flex-col rounded-2xl bg-panel p-4"
+      className="flex min-h-0 flex-col rounded-3xl bg-panel p-4"
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
@@ -125,14 +125,14 @@ export function SourcesPanel({
       }}
     >
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm">Sources</h2>
+        <h2 className="text-[15px]">Sources</h2>
         <OutOfScope className="!p-1" align="right" label="Collapse">
           <Icon name="panel" className="size-4" />
         </OutOfScope>
       </div>
 
       {banner && (
-        <div className="mb-3 flex items-start gap-2 rounded-xl bg-indigo-500/10 p-3 text-xs">
+        <div className="mb-3 flex items-start gap-2 rounded-2xl bg-indigo-500/10 p-3 text-[13px]">
           <Icon name="note" className="mt-0.5 size-4" />
           <p className="flex-1">
             <strong className="block font-medium">Meet the new notes!</strong>
@@ -147,22 +147,22 @@ export function SourcesPanel({
       <div className="mb-3 grid grid-cols-2 gap-2">
         <button
           onClick={() => setDialog(true)}
-          className="flex items-center justify-center gap-2 rounded-full bg-foreground/[0.06] py-2.5 text-sm hover:bg-foreground/10"
+          className="flex items-center justify-center gap-2 rounded-full bg-foreground/[0.06] py-3 text-[15px] hover:bg-foreground/10"
         >
           <Icon name="plus" className="size-4" /> Add sources
         </button>
         <button
           onClick={onCreateNote}
-          className="flex items-center justify-center gap-2 rounded-full bg-foreground/[0.06] py-2.5 text-sm hover:bg-foreground/10"
+          className="flex items-center justify-center gap-2 rounded-full bg-foreground/[0.06] py-3 text-[15px] hover:bg-foreground/10"
         >
           <Icon name="plus" className="size-4" /> Create note
         </button>
       </div>
 
       <Tooltip text="Not part of this clone's scope" block>
-        <div aria-disabled="true" className="mb-3 w-full cursor-not-allowed rounded-2xl bg-foreground/[0.06] p-3 text-foreground/35">
-          <p className="mb-3 text-sm">Search the web for new sources</p>
-          <div className="flex items-center gap-2 text-sm">
+        <div aria-disabled="true" className="mb-3 w-full cursor-not-allowed rounded-3xl bg-foreground/[0.06] p-4 text-foreground/35">
+          <p className="mb-4 text-[15px]">Search the web for new sources</p>
+          <div className="flex items-center gap-2 text-[15px]">
             <span className="flex items-center gap-1.5 rounded-full bg-panel px-3 py-1.5">
               <Icon name="globe" className="size-4" /> Web <Icon name="chevron" className="size-3.5" />
             </span>
@@ -178,7 +178,7 @@ export function SourcesPanel({
       {uploading && <p className="mb-2 text-xs text-foreground/60">Uploading...</p>}
 
       {sources.length === 0 && notes.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-sm text-foreground/60">
+        <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-[15px] text-foreground/60">
           <Icon name="doc" className="mb-2 size-6" />
           <p className="font-medium text-foreground/80">Saved sources will appear here</p>
           <p>Add files, websites, or more. Then ask questions or create things based on these sources.</p>
@@ -191,7 +191,7 @@ export function SourcesPanel({
         </div>
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <label className="mb-1 flex items-center justify-between px-1 text-sm">
+          <label className="mb-1 flex items-center justify-between px-1 text-[15px]">
             <Icon name="sort" className="size-4 text-foreground/60" />
             <span className="flex items-center gap-3">
               Select all
@@ -207,14 +207,14 @@ export function SourcesPanel({
 
           {notes.length > 0 && (
             <div className="mb-1">
-              <button onClick={() => setNotesOpen(!notesOpen)} className="flex w-full items-center gap-2 px-1 py-2 text-sm">
+              <button onClick={() => setNotesOpen(!notesOpen)} className="flex w-full items-center gap-2 px-1 py-2 text-[15px]">
                 <Icon name="chevron" className={`size-4 transition-transform ${notesOpen ? "" : "-rotate-90"}`} /> Notes
               </button>
               {notesOpen &&
                 notes.map((n) => (
                   <div
                     key={n.id}
-                    className={`flex items-center gap-2 rounded-xl px-2 py-1.5 ${n.id === openNoteId ? "bg-foreground/[0.07]" : "hover:bg-foreground/5"}`}
+                    className={`flex items-center gap-2 rounded-xl px-3 py-2 ${n.id === openNoteId ? "bg-foreground/[0.07]" : "hover:bg-foreground/5"}`}
                   >
                     <Icon name="note" className="size-5" />
                     {renamingId === n.id ? (
@@ -230,7 +230,7 @@ export function SourcesPanel({
                         onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
                       />
                     ) : (
-                      <button onClick={() => onOpenNote(n.id)} className="min-w-0 flex-1 truncate text-left text-sm">
+                      <button onClick={() => onOpenNote(n.id)} className="min-w-0 flex-1 truncate text-left text-[15px]">
                         {n.title}
                       </button>
                     )}
@@ -249,9 +249,9 @@ export function SourcesPanel({
           )}
 
           {sources.map((s) => (
-            <div key={s.id} className="flex items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-foreground/5">
+            <div key={s.id} className="flex items-center gap-2 rounded-xl px-3 py-2 hover:bg-foreground/5">
               <Icon name={typeIcon[s.type]} className="size-5 text-indigo-600" />
-              <span className="min-w-0 flex-1 truncate text-sm" title={s.title}>
+              <span className="min-w-0 flex-1 truncate text-[15px]" title={s.title}>
                 {s.title}
               </span>
               {s.status !== "ready" && <span className={`rounded px-1.5 py-0.5 text-xs ${badge[s.status]}`}>{s.status}</span>}
