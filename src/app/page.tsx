@@ -9,7 +9,7 @@ export default async function HomePage() {
   const email = data?.claims.email as string | undefined;
 
   // RLS limits every query to the user's own Notebook (exactly one, created at signup).
-  const { data: notebook } = await supabase.from("notebooks").select("id").single();
+  const { data: notebook } = await supabase.from("notebooks").select("id, guide").single();
   const [{ data: sources }, { data: notes }] = await Promise.all([
     supabase.from("sources").select("id, title, type, status").order("created_at"),
     supabase.from("notes").select("id, title, content").order("created_at"),
@@ -17,9 +17,9 @@ export default async function HomePage() {
 
   return (
     <div className="flex h-screen flex-col bg-page">
-      <Header email={email} />
+      <Header email={email} title={notebook?.guide?.title} />
       {notebook ? (
-        <Workspace notebookId={notebook.id} sources={sources ?? []} notes={notes ?? []} />
+        <Workspace notebookId={notebook.id} sources={sources ?? []} notes={notes ?? []} guide={notebook.guide} />
       ) : (
         <p className="p-6 text-sm">Your Notebook was not found. Try signing out and in again.</p>
       )}
