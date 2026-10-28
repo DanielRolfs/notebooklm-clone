@@ -33,12 +33,17 @@ export async function addSource(
 
 /**
  * Contract: POST /api/chat. Newline-delimited JSON:
- * {type:"text",delta} lines, then {type:"citations",items} or {type:"error",message}.
+ * {type:"text",delta} lines, then {type:"citations",items}, then optionally
+ * {type:"suggestions",items:[string,string,string]}; or {type:"error",message} at any point.
  */
 export async function streamChat(
   question: string,
   sourceIds: string[],
-  on: { text: (delta: string) => void; citations: (items: Citation[]) => void },
+  on: {
+    text: (delta: string) => void;
+    citations: (items: Citation[]) => void;
+    suggestions?: (items: string[]) => void; // optional line: no line means no cards
+  },
 ): Promise<void> {
   const res = await fetch("/api/chat", {
     method: "POST",
@@ -54,6 +59,7 @@ export async function streamChat(
     const msg = JSON.parse(line);
     if (msg.type === "text") on.text(msg.delta);
     else if (msg.type === "citations") on.citations(msg.items);
+    else if (msg.type === "suggestions") on.suggestions?.(msg.items);
     else if (msg.type === "error") throw new Error(msg.message);
   };
   // A network chunk can end mid-line, so keep the unfinished tail in the buffer.
