@@ -24,6 +24,7 @@ Send us your finished result as a reply to this email. As soon as we’ve review
       1. LLM response
 3. Improve Initial Analysis (5 min)
 4. Grill with Docs (Matt Pocock Skill)(30 min)
+5. Build, review and deploy with AI agents: a manager session, parallel subagents in git worktrees, one pull request per feature tested on its Vercel preview (about 2 h 30 min, wall-clock)
 
 ## Basic AI Instructions:
 
