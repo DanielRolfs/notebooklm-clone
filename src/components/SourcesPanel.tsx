@@ -16,13 +16,24 @@ export type Source = {
 export type Note = { id: string; title: string; content: string };
 
 const MAX_SOURCES = 50;
-const typeIcon: Record<Source["type"], IconName> = { file: "doc", text: "clipboard", website: "link", youtube: "play" };
 const badge: Record<Source["status"], string> = {
   pending: "bg-foreground/10 text-foreground/60",
   processing: "bg-amber-500/20 text-amber-700 dark:text-amber-300",
   ready: "",
   failed: "bg-red-500/20 text-red-700 dark:text-red-300",
 };
+
+// Blue markdown/text file icon, red for PDFs; links and videos keep their glyph.
+function SourceIcon({ source }: { source: Source }) {
+  if (source.type === "website" || source.type === "youtube") return <Icon name={source.type === "website" ? "link" : "play"} className="size-5 text-indigo-600" />;
+  const pdf = /\.pdf$/i.test(source.title);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={`size-5 shrink-0 ${pdf ? "stroke-red-600" : "stroke-blue-600"}`}>
+      <rect x="2.5" y="5" width="19" height="14" rx="1.5" />
+      {pdf ? <path d="M7 15v-5h2a1.5 1.5 0 010 3H7M12 15v-5M15 10h2.5M15 12.5h2" /> : <path d="M6 15v-4l2 2.5 2-2.5v4M16 10v5M14 13l2 2 2-2" />}
+    </svg>
+  );
+}
 
 // Three-dot menu; the full-screen button behind it closes it on any outside click.
 function RowMenu({ label, items }: { label: string; items: { text: string; icon: IconName; run: () => void }[] }) {
@@ -127,13 +138,13 @@ export function SourcesPanel({
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-[15px]">Sources</h2>
         <OutOfScope className="!p-1" align="right" label="Collapse">
-          <Icon name="panel" className="size-4" />
+          <Icon name="panelLeft" className="size-4" />
         </OutOfScope>
       </div>
 
       {banner && (
         <div className="mb-3 flex items-start gap-2 rounded-2xl bg-indigo-500/10 p-3 text-[13px]">
-          <Icon name="note" className="mt-0.5 size-4" />
+          <span aria-hidden="true">📝</span>
           <p className="flex-1">
             <strong className="block font-medium">Meet the new notes!</strong>
             Notes now live with your sources. You can chat, cite, and generate from them
@@ -207,9 +218,12 @@ export function SourcesPanel({
 
           {notes.length > 0 && (
             <div className="mb-1">
-              <button onClick={() => setNotesOpen(!notesOpen)} className="flex w-full items-center gap-2 px-1 py-2 text-[15px]">
-                <Icon name="chevron" className={`size-4 transition-transform ${notesOpen ? "" : "-rotate-90"}`} /> Notes
-              </button>
+              <div className="flex items-center pr-3">
+                <button onClick={() => setNotesOpen(!notesOpen)} className="flex flex-1 items-center gap-2 px-1 py-2 text-left text-[15px]">
+                  <Icon name="chevron" className={`size-4 transition-transform ${notesOpen ? "" : "-rotate-90"}`} /> Notes
+                </button>
+                <input type="checkbox" checked disabled readOnly aria-label="Notes included" />
+              </div>
               {notesOpen &&
                 notes.map((n) => (
                   <div
@@ -250,7 +264,7 @@ export function SourcesPanel({
 
           {sources.map((s) => (
             <div key={s.id} className="flex items-center gap-2 rounded-xl px-3 py-2 hover:bg-foreground/5">
-              <Icon name={typeIcon[s.type]} className="size-5 text-indigo-600" />
+              <SourceIcon source={s} />
               <span className="min-w-0 flex-1 truncate text-[15px]" title={s.title}>
                 {s.title}
               </span>
