@@ -10,7 +10,7 @@ test.describe("start page", () => {
 
     const res = await page.goto("/welcome");
     expect(res?.status()).toBe(200);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Simply understand everything/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Simply\s*understand\s*everything/) // the words sit on separate lines, so no spaces in the text;
     await page.waitForLoadState("networkidle");
     expect(errors).toEqual([]);
   });
