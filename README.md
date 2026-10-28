@@ -88,6 +88,18 @@ npm run build
 
 Anonymous visitors on `/` are sent to the public start page at `/welcome`; every other page needs a login.
 
+## End-to-end tests
+
+`npm run test:e2e` drives the real app in Google Chrome with Playwright, including the signed-in screens: sources, guide, chat with citations, notes, panel folding and sign-out. Google login itself is not automated. Instead the setup uses the service role key to create a throwaway user (`e2e-...@example.test`) and mints a real Supabase session for it. The app has no test-only code. When the run ends, the user and everything it created are deleted.
+
+- It needs `SUPABASE_SERVICE_ROLE_KEY` (plus the two public Supabase variables) from `.env.local`, so it runs on your machine, not in CI or on Vercel.
+- A layout test opens the signed-in app at 900, 1100, 1280, 1440 and 1920 px wide and fails if anything sticks out of its container or the page scrolls sideways. `E2E_SHOTS_DIR=folder` also saves its screenshots.
+- It uses the model: the guide and two chat questions, plus the embeddings. That costs a few cents of OpenRouter credit per run.
+- Only the logged-out checks (start page, redirects, closed API routes), no keys needed: `npm run test:e2e:public`
+- Against the deployed site instead of a local dev server: `E2E_BASE_URL=https://your-app.vercel.app npm run test:e2e` (the keys must belong to the same Supabase project as that site).
+- The tests use the installed Google Chrome. Without it, run `npx playwright install chromium` and remove `channel: "chrome"` in [playwright.config.ts](playwright.config.ts).
+- The HTML report lands in `playwright-report/` (open it with `npx playwright show-report`).
+
 ## Models
 
 Model names are in [src/config/models.ts](src/config/models.ts). The embedding model must stay at 1536 dimensions to match the `chunks` table.

@@ -29,7 +29,7 @@ Every other feature shows a grayed-out icon with the tooltip: *"Not part of this
 - **Models:** One OpenRouter key. Claude for chat, `openai/text-embedding-3-small` for embeddings. Model names live in one config file.
 - **Notes:** Written by the user. Saving a chat answer as a note is grayed out.
 - **Auto summary (notebook guide):** One model call over the ready Sources (not part of the graph). Title, summary and three question cards are stored in `notebooks.guide` and reused while the set of Sources is unchanged.
-- **Tests:** Unit tests for chunking, file extraction and the guide helpers (13, Vitest). An end-to-end Playwright test is still open.
+- **Tests:** Unit tests for chunking, file extraction and the guide helpers (13, Vitest). End-to-end tests with Playwright cover the public and the signed-in screens (run locally, see the README).
 - See [ADR 0001](docs/adr/0001-rag-with-pgvector-via-openrouter.md) and [TECHNICAL.md](TECHNICAL.md).
 
 ## Working rules

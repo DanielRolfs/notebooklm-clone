@@ -119,7 +119,9 @@ Like the real app, the notebook shows a title, a summary and three clickable que
 
 ## Tests
 
-`npm test` runs 13 unit tests with Vitest: [chunking](src/lib/ingest/chunk.test.ts), [file extraction](src/lib/ingest/extract.test.ts) and the [guide helpers](src/lib/guide.test.ts). There is no end-to-end test yet.
+`npm test` runs 13 unit tests with Vitest: [chunking](src/lib/ingest/chunk.test.ts), [file extraction](src/lib/ingest/extract.test.ts) and the [guide helpers](src/lib/guide.test.ts).
+
+`npm run test:e2e` runs the Playwright end-to-end tests in [e2e/](e2e/). Vitest ignores that folder. Two projects: `public` ([public.spec.ts](e2e/public.spec.ts): start page, redirects, API routes closed without a session) and `signed-in` ([app.spec.ts](e2e/app.spec.ts): one serial flow through sources, guide, chat, notes, panel and sign-out). Sign-in without Google works like this: [global-setup.ts](e2e/global-setup.ts) creates a throwaway user with the service role key, turns a generated magic link into a session, lets `@supabase/ssr` encode that session as cookies and saves them as the browser's storage state. [global-teardown.ts](e2e/global-teardown.ts) deletes that user, and only that one (the foreign keys cascade). No code in `src/` knows about the tests. The run needs the service role key, so it is meant for a developer machine, and it spends a few cents of model credit.
 
 ## How it was built
 
