@@ -34,11 +34,12 @@ export function StudioPanel({ onCollapse }: { onCollapse: () => void }) {
         <h2>Studio</h2>
         <CollapseButton onClick={onCollapse} />
       </div>
-      <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
+      <div className="studio-grid">
         {tools.map(([name, icon, color]) => (
-          <OutOfScope key={name} block className="h-12 w-full !justify-start !gap-3 border border-foreground/10 !px-3 !py-0 text-[13px] whitespace-nowrap">
-            <Icon name={icon} className={`size-5 opacity-60 ${color}`} /> {name}
-            {name === "Reports" && <span className="ml-auto rounded-full bg-foreground/10 px-2 py-0.5 text-xs">New!</span>}
+          <OutOfScope key={name} block className="@container h-12 w-full min-w-0 !justify-start !gap-3 border border-foreground/10 !px-3 !py-0 text-[13px] whitespace-nowrap">
+            <Icon name={icon} className={`size-5 shrink-0 opacity-60 ${color}`} />
+            <span className="min-w-0 truncate">{name}</span>
+            {name === "Reports" && <span className="ml-auto hidden shrink-0 rounded-full bg-foreground/10 px-2 py-0.5 text-xs @min-[170px]:inline">New!</span>}
           </OutOfScope>
         ))}
       </div>
@@ -59,7 +60,7 @@ const TOOLBAR: (IconName | "|" | "style")[] = [
 
 function NoteToolbar() {
   return (
-    <div className="flex items-center gap-0.5 border-b border-foreground/10 px-1 py-2">
+    <div className="flex flex-wrap items-center gap-y-1 gap-x-0.5 border-b border-foreground/10 px-1 py-2">
       {TOOLBAR.map((item, i) =>
         item === "|" ? (
           <span key={i} className="mx-2 h-4 w-px bg-foreground/15" />

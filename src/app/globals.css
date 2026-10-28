@@ -88,3 +88,10 @@ input[type="checkbox"]:disabled {
 input[type="checkbox"]:disabled:not(:checked) {
   opacity: 0.4;
 }
+
+/* Studio tiles: 3 per row when the panel is wide, 2 when narrow (never narrower than 132px each). */
+.studio-grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(max(132px, calc((100% - 1rem) / 3)), 1fr));
+}

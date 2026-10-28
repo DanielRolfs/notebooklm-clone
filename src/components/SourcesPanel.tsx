@@ -174,13 +174,13 @@ export function SourcesPanel({
         <div aria-disabled="true" className="mb-3 w-full cursor-not-allowed rounded-3xl bg-foreground/[0.06] p-4 text-foreground/35">
           <p className="mb-4">Search the web for new sources</p>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 rounded-full bg-panel px-3 py-1.5">
-              <Icon name="globe" className="size-4" /> Web <Icon name="chevron" className="size-3.5" />
+            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-panel px-3 py-1.5">
+              <Icon name="globe" className="size-4 shrink-0" /> Web <Icon name="chevron" className="size-3.5 shrink-0" />
             </span>
-            <span className="flex items-center gap-1.5 rounded-full bg-panel px-3 py-1.5">
-              <Icon name="search" className="size-4" /> Fast Research <Icon name="chevron" className="size-3.5" />
+            <span className="flex min-w-0 items-center gap-1.5 rounded-full bg-panel px-3 py-1.5">
+              <Icon name="search" className="size-4 shrink-0" /> <span className="min-w-0 truncate">Fast Research</span> <Icon name="chevron" className="size-3.5 shrink-0" />
             </span>
-            <Icon name="arrowRight" className="ml-auto size-4" />
+            <Icon name="arrowRight" className="ml-auto size-4 shrink-0" />
           </div>
         </div>
       </Tooltip>

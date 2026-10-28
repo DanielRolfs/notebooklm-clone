@@ -11,7 +11,7 @@ export function Tooltip({
   block?: boolean;
 }) {
   return (
-    <span className={`group relative ${block ? "flex w-full" : "inline-flex"}`}>
+    <span className={`group relative ${block ? "flex w-full min-w-0" : "inline-flex"}`}>
       {children}
       <span
         role="tooltip"
