@@ -17,14 +17,21 @@ const tools: [string, IconName][] = [
   ["Data Table", "table"],
 ];
 
-export function StudioPanel() {
+// Folds the right column in; hidden on small screens where the columns are stacked.
+function CollapseButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button onClick={onClick} aria-label="Collapse panel" className="hidden rounded-full p-1 text-foreground/60 hover:bg-foreground/10 lg:block">
+      <Icon name="panel" className="size-4" />
+    </button>
+  );
+}
+
+export function StudioPanel({ onCollapse }: { onCollapse: () => void }) {
   return (
     <section className="flex min-h-0 flex-col rounded-2xl bg-panel p-4">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm">Studio</h2>
-        <OutOfScope className="!p-1" align="right" label="Collapse">
-          <Icon name="panel" className="size-4" />
-        </OutOfScope>
+        <CollapseButton onClick={onCollapse} />
       </div>
       <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
         {tools.map(([name, icon]) => (
@@ -48,12 +55,14 @@ export function NoteEditor({
   onSave,
   onRemove,
   onClose,
+  onCollapse,
 }: {
   note: Note;
   onChange: (fields: Partial<Note>) => void;
   onSave: (fields: Partial<Note>) => void;
   onRemove: () => void;
   onClose: () => void;
+  onCollapse: () => void;
 }) {
   // Last text that reached the database, so blur and debounce never save the same thing twice.
   const saved = useRef({ title: note.title, content: note.content });
@@ -76,9 +85,12 @@ export function NoteEditor({
         <p>
           <span className="text-foreground/60">Studio</span> <span className="text-foreground/40">›</span> Note
         </p>
-        <button onClick={onClose} aria-label="Close note" className="rounded-full p-1 text-foreground/60 hover:bg-foreground/10">
-          <Icon name="close" className="size-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={onClose} aria-label="Close note" className="rounded-full p-1 text-foreground/60 hover:bg-foreground/10">
+            <Icon name="close" className="size-4" />
+          </button>
+          <CollapseButton onClick={onCollapse} />
+        </div>
       </div>
       <div className="mb-3 flex items-center gap-2">
         <input
