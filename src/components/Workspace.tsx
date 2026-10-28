@@ -81,7 +81,11 @@ export function Workspace({
   return (
     <div
       className={`grid min-h-0 flex-1 grid-cols-1 gap-3 px-3 pb-3 transition-[grid-template-columns] duration-300 ${
-        collapsed ? "lg:grid-cols-[320px_minmax(0,1fr)_40px]" : "lg:grid-cols-[320px_minmax(0,1fr)_360px]"
+        collapsed
+          ? "lg:grid-cols-[minmax(280px,25%)_minmax(0,1fr)_40px]"
+          : open
+            ? "lg:grid-cols-[minmax(260px,21%)_minmax(0,1fr)_minmax(360px,37%)]"
+            : "lg:grid-cols-[minmax(280px,25%)_minmax(0,1fr)_minmax(320px,25%)]"
       }`}
     >
       <SourcesPanel
@@ -111,7 +115,7 @@ export function Workspace({
           </button>
         )}
         {/* Stays mounted when collapsed so an open note keeps its text and autosave. */}
-        <div className={`flex h-full min-h-0 flex-col gap-2 lg:w-[360px] [&>section]:flex-1 ${collapsed ? "lg:invisible" : ""}`}>
+        <div className={`flex h-full min-h-0 flex-col gap-2 [&>section]:flex-1 ${collapsed ? "lg:invisible" : ""}`}>
         {error && <p role="alert" className="rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-300">{error}</p>}
         {open ? (
           <NoteEditor

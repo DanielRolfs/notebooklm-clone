@@ -23,8 +23,55 @@
   }
 }
 
+/* Start page diagram: static, right-anchored, and scaled with the window width like the reference
+   (about 0.74 at 1440px, 1.0 at 2000px). Chips keep a fixed size and follow the same coordinates. */
+@media (min-width: 1024px) {
+  .flow-svg {
+    position: absolute;
+    right: 0;
+    top: calc(142.15px - 0.657vw);
+    width: calc(47.9vw + 62px);
+    height: auto;
+  }
+  .flow-chip {
+    position: absolute;
+    left: calc(100vw * (1 - (2000 - var(--x)) * 0.0004696) - (2000 - var(--x)) * 0.0608px);
+    top: calc(143px + (var(--y) - 144) * 0.0608px + 100vw * (var(--y) - 144) * 0.0004696);
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Dark rounded-square checkboxes with a check mark, instead of the browser's blue default. */
+input[type="checkbox"] {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid var(--foreground);
+  border-radius: 0.25rem;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="checkbox"]:checked {
+  background: var(--foreground);
+}
+input[type="checkbox"]:checked::after {
+  content: "";
+  width: 0.3rem;
+  height: 0.55rem;
+  margin-top: -0.1rem;
+  border: solid var(--background);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+input[type="checkbox"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

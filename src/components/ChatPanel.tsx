@@ -46,7 +46,7 @@ function SuggestionCards({ items, onAsk, disabled }: { items: string[]; onAsk: (
           key={q}
           onClick={() => onAsk(q)}
           disabled={disabled}
-          className="flex min-h-32 flex-col justify-between gap-4 rounded-3xl bg-foreground/[0.06] p-4 text-left text-sm hover:bg-foreground/10 disabled:opacity-50"
+          className="flex min-h-32 flex-col justify-between gap-4 rounded-3xl bg-foreground/[0.06] p-5 text-left text-[15px] leading-6 hover:bg-foreground/10 disabled:opacity-50"
         >
           {q}
           <Icon name="arrowRight" className="size-4" />
@@ -164,15 +164,15 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
           {turns.length === 0 && readyIds.length === 0 && (
             <div className="pt-6">
               <p className="mb-8 text-6xl">👋</p>
-              <h2 className="mb-4 text-4xl font-light">Let&apos;s start your notebook...</h2>
-              <p className="mb-6 text-sm text-foreground/70">
+              <h2 className="mb-5 text-4xl font-light">Let&apos;s start your notebook...</h2>
+              <p className="mb-6 text-base leading-7 text-foreground/75">
                 This is your blank canvas to understand, create, or make progress on something new. Add your own sources, tick the
                 ones you want to use, and ask questions about them.
               </p>
-              <p className="mb-3 text-sm font-medium">What would you like this notebook to help you do?</p>
+              <p className="mb-3 text-[15px] font-medium">What would you like this notebook to help you do?</p>
               <div className="flex flex-col items-start gap-2">
                 {starters.map((s) => (
-                  <button key={s} onClick={() => setInput(s)} className="rounded-full bg-foreground/[0.06] px-4 py-2 text-sm hover:bg-foreground/10">
+                  <button key={s} onClick={() => setInput(s)} className="rounded-full bg-foreground/[0.06] px-4 py-2.5 text-[15px] hover:bg-foreground/10">
                     {s}
                   </button>
                 ))}
@@ -184,11 +184,11 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
             const last = i === turns.length - 1;
             return (
               <article key={i} className="mb-10">
-                <h2 className="mb-3 text-3xl font-light leading-tight">{t.question}</h2>
+                <h2 className="mb-3 text-4xl font-light leading-tight">{t.question}</h2>
                 <p className="mb-6 text-sm">
                   {t.sourceCount} {t.sourceCount === 1 ? "source" : "sources"} · {t.date}
                 </p>
-                <p className="whitespace-pre-wrap text-[15px] leading-7 text-foreground/85">
+                <p className="whitespace-pre-wrap text-base leading-7 text-foreground/85">
                   <Answer text={t.answer} citations={t.citations} />
                   {busy && last && !t.error && <span className="animate-pulse"> ...</span>}
                 </p>
@@ -228,7 +228,7 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
             e.preventDefault();
             ask(input.trim());
           }}
-          className="flex items-center gap-3 rounded-full bg-panel px-4 py-2 shadow-sm"
+          className="flex items-center gap-3 rounded-full bg-panel px-4 py-2.5 shadow-sm"
         >
           <OutOfScope label="Chat settings" className="!p-1">
             <Icon name="tune" />
@@ -237,9 +237,9 @@ export function ChatPanel({ sourceIds, readyIds, guide }: { sourceIds: string[];
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a question or create something"
-            className="min-w-0 flex-1 bg-transparent py-2 text-sm outline-none"
+            className="min-w-0 flex-1 bg-transparent py-2 text-base outline-none"
           />
-          <span className="text-sm text-foreground/60">
+          <span className="text-[15px] text-foreground/60">
             {sourceIds.length} {sourceIds.length === 1 ? "source" : "sources"}
           </span>
           <button
