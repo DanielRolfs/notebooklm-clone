@@ -1,144 +1,59 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect, useRef } from "react";
+import { Icon, type IconName } from "./Icons";
 import { OutOfScope } from "./Tooltip";
+import type { Note } from "./SourcesPanel";
 
-export type Note = { id: string; title: string; content: string };
+const tools: [string, IconName][] = [
+  ["Audio Overview", "audio"],
+  ["Slide Deck", "slides"],
+  ["Video Overview", "video"],
+  ["Mind Map", "mindmap"],
+  ["Reports", "doc"],
+  ["Flashcards", "slides"],
+  ["Quiz", "quiz"],
+  ["Infographic", "chart"],
+  ["Data Table", "table"],
+];
 
-export function NotesPanel({ notebookId, initialNotes }: { notebookId: string; initialNotes: Note[] }) {
-  const [supabase] = useState(createClient);
-  const [notes, setNotes] = useState(initialNotes);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [menuId, setMenuId] = useState<string | null>(null);
-  const [renamingId, setRenamingId] = useState<string | null>(null);
-  const [error, setError] = useState("");
-  const open = notes.find((n) => n.id === openId);
-
-  const patch = (id: string, fields: Partial<Note>) =>
-    setNotes((ns) => ns.map((n) => (n.id === id ? { ...n, ...fields } : n)));
-
-  async function create() {
-    setError("");
-    const { data, error } = await supabase
-      .from("notes")
-      .insert({ notebook_id: notebookId })
-      .select("id, title, content")
-      .single();
-    if (error) return setError(error.message);
-    setNotes((ns) => [...ns, data]);
-    setOpenId(data.id);
-  }
-
-  async function save(id: string, fields: Partial<Note>) {
-    const { error } = await supabase
-      .from("notes")
-      .update({ ...fields, updated_at: new Date().toISOString() })
-      .eq("id", id);
-    setError(error ? `Could not save: ${error.message}` : "");
-  }
-
-  async function remove(id: string) {
-    setError("");
-    const { error } = await supabase.from("notes").delete().eq("id", id);
-    if (error) return setError(error.message);
-    setNotes((ns) => ns.filter((n) => n.id !== id));
-    setOpenId(null);
-    setMenuId(null);
-  }
-
+export function StudioPanel() {
   return (
-    <section className="flex min-h-0 flex-col rounded-xl border border-foreground/10 p-3">
-      <h2 className="mb-3 text-sm font-medium">Notes</h2>
-      {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
-      {open ? (
-        <NoteEditor
-          key={open.id}
-          note={open}
-          onBack={() => setOpenId(null)}
-          onChange={(fields) => patch(open.id, fields)}
-          onSave={(fields) => save(open.id, fields)}
-          onRemove={() => remove(open.id)}
-        />
-      ) : (
-        <>
-          <div className="mb-3 flex flex-wrap gap-2">
-            <OutOfScope>Audio Overview</OutOfScope>
-            <OutOfScope>Mind Map</OutOfScope>
-          </div>
-          <button onClick={create} className="mb-3 rounded-full border border-foreground/20 py-2 text-sm hover:bg-foreground/5">
-            + New note
-          </button>
-          {notes.length > 0 && <p className="mb-1 text-xs uppercase tracking-wide text-foreground/50">Notes folder</p>}
-          <ul className="min-h-0 flex-1 overflow-y-auto">
-            {notes.map((n) => (
-              <li key={n.id} className="relative flex items-center rounded-md px-1 hover:bg-foreground/5">
-                {renamingId === n.id ? (
-                  <input
-                    autoFocus
-                    defaultValue={n.title}
-                    aria-label="Note title"
-                    className="my-1 min-w-0 flex-1 rounded border border-foreground/20 bg-transparent px-2 py-1 text-sm"
-                    onBlur={(e) => {
-                      const title = e.target.value.trim() || n.title;
-                      patch(n.id, { title });
-                      save(n.id, { title });
-                      setRenamingId(null);
-                    }}
-                    onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-                  />
-                ) : (
-                  <button onClick={() => setOpenId(n.id)} className="min-w-0 flex-1 truncate py-2 text-left text-sm">
-                    {n.title}
-                  </button>
-                )}
-                <button
-                  aria-label={`Actions for ${n.title}`}
-                  onClick={() => setMenuId(menuId === n.id ? null : n.id)}
-                  className="px-2 text-foreground/60"
-                >
-                  ⋮
-                </button>
-                {menuId === n.id && (
-                  <div className="absolute right-0 top-full z-30 w-36 rounded-md border border-foreground/20 bg-background py-1 text-sm shadow-lg">
-                    <button
-                      className="block w-full px-3 py-1.5 text-left hover:bg-foreground/5"
-                      onClick={() => {
-                        setRenamingId(n.id);
-                        setMenuId(null);
-                      }}
-                    >
-                      Rename note
-                    </button>
-                    <button
-                      className="block w-full px-3 py-1.5 text-left hover:bg-foreground/5"
-                      onClick={() => remove(n.id)}
-                    >
-                      Remove note
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
+    <section className="flex min-h-0 flex-col rounded-2xl bg-panel p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-sm">Studio</h2>
+        <OutOfScope className="!p-1" align="right" label="Collapse">
+          <Icon name="panel" className="size-4" />
+        </OutOfScope>
+      </div>
+      <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
+        {tools.map(([name, icon]) => (
+          <OutOfScope key={name} block className="!rounded-xl border border-foreground/10 !px-2 text-xs">
+            <Icon name={icon} className="size-4" /> {name}
+          </OutOfScope>
+        ))}
+      </div>
+      <div className="flex flex-1 flex-col items-center justify-center gap-1 px-4 text-center text-sm text-foreground/60">
+        <Icon name="pencil" className="mb-2 size-6" />
+        <p className="font-medium text-foreground/80">Studio output will be saved here.</p>
+        <p>After adding sources, click to add Audio Overview, Study Guide, Mind Map, and more!</p>
+      </div>
     </section>
   );
 }
 
-function NoteEditor({
+export function NoteEditor({
   note,
-  onBack,
   onChange,
   onSave,
   onRemove,
+  onClose,
 }: {
   note: Note;
-  onBack: () => void;
   onChange: (fields: Partial<Note>) => void;
   onSave: (fields: Partial<Note>) => void;
   onRemove: () => void;
+  onClose: () => void;
 }) {
   // Last text that reached the database, so blur and debounce never save the same thing twice.
   const saved = useRef({ title: note.title, content: note.content });
@@ -156,30 +71,36 @@ function NoteEditor({
   });
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <button onClick={onBack} className="text-sm text-foreground/60 hover:underline">
-          ← Notes
-        </button>
-        <button onClick={onRemove} className="rounded-md border border-foreground/20 px-3 py-1 text-sm hover:bg-red-500/10">
-          Remove
+    <section className="flex min-h-0 flex-col rounded-2xl bg-panel p-4">
+      <div className="mb-4 flex items-center justify-between text-sm">
+        <p>
+          <span className="text-foreground/60">Studio</span> <span className="text-foreground/40">›</span> Note
+        </p>
+        <button onClick={onClose} aria-label="Close note" className="rounded-full p-1 text-foreground/60 hover:bg-foreground/10">
+          <Icon name="close" className="size-4" />
         </button>
       </div>
-      <input
-        value={note.title}
-        onChange={(e) => onChange({ title: e.target.value })}
-        onBlur={flush}
-        aria-label="Note title"
-        className="rounded-md border border-foreground/20 bg-transparent px-3 py-2 text-sm font-medium"
-      />
+      <div className="mb-3 flex items-center gap-2">
+        <input
+          value={note.title}
+          onChange={(e) => onChange({ title: e.target.value })}
+          onBlur={flush}
+          aria-label="Note title"
+          placeholder="New Note"
+          className="min-w-0 flex-1 bg-transparent text-xl outline-none"
+        />
+        <button onClick={onRemove} className="flex items-center gap-1.5 rounded-full border border-foreground/15 px-3 py-1.5 text-sm hover:bg-red-500/10">
+          <Icon name="trash" className="size-4" /> Remove
+        </button>
+      </div>
       <textarea
         value={note.content}
         onChange={(e) => onChange({ content: e.target.value })}
         onBlur={flush}
         aria-label="Note text"
         placeholder="Write your note"
-        className="min-h-0 flex-1 resize-none rounded-md border border-foreground/20 bg-transparent px-3 py-2 text-sm"
+        className="min-h-0 flex-1 resize-none rounded-xl bg-foreground/[0.04] px-4 py-3 text-sm outline-none"
       />
-    </div>
+    </section>
   );
 }
