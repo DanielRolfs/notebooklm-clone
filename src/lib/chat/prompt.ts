@@ -18,6 +18,28 @@ export function buildSystemPrompt(chunks: RetrievedChunk[]): string {
   return SYSTEM_PROMPT + chunks.map((c) => `[${c.n}] ${c.content}`).join("\n\n");
 }
 
+export const SUGGESTION_PROMPT = `Suggest 3 short follow-up questions (max 90 characters each) that the excerpts below can answer.
+Base them on the user's question and the answer. Reply with ONLY a JSON array of 3 strings.
+
+Excerpts:
+`;
+
+// Defensive: the model may wrap the array in prose or code fences. Returns [] on anything unexpected.
+export function parseSuggestions(text: string): string[] {
+  const match = text.match(/\[[\s\S]*\]/);
+  if (!match) return [];
+  try {
+    const arr: unknown = JSON.parse(match[0]);
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+      .map((s) => s.trim().slice(0, 90))
+      .slice(0, 3);
+  } catch {
+    return [];
+  }
+}
+
 // Numbers the model actually cited, e.g. "[1][3]" -> {1, 3}.
 export function citedNumbers(answer: string): Set<number> {
   return new Set([...answer.matchAll(/\[(\d+)\]/g)].map((m) => Number(m[1])));
