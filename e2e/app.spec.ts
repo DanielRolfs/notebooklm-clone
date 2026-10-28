@@ -54,11 +54,6 @@ async function waitUntilReady(page: Page, title: string) {
   await expect(sourceCheckbox(page, title)).toBeEnabled({ timeout: MODEL_WAIT });
 }
 
-async function openNoteMenu(page: Page, title: string, item: string) {
-  await page.getByRole("button", { name: `Actions for ${title}` }).click();
-  await page.getByRole("button", { name: item, exact: true }).click();
-}
-
 // Autosave: blur saves at once, the debounce covers the rest; give both a moment to reach the database.
 const letSaveFinish = (page: Page) => page.waitForTimeout(2000);
 
@@ -86,6 +81,13 @@ test("a: empty state", async () => {
   await page.goto("/");
   await expect(header(page).getByText("Untitled notebook")).toBeVisible();
   await expect(page.getByText("Saved sources will appear here")).toBeVisible();
+
+  // Everything the reference start screen shows is there (screenshots 2 and 3), working or not.
+  for (const starter of ["Learn about a new topic", "Create something new", "Make progress on a project"]) {
+    await expect(page.getByRole("button", { name: starter })).toBeVisible();
+  }
+  await expect(page.getByText("Search the web for new sources")).toBeVisible();
+  await expect(page.getByText("You can now search Google Drive files from chat")).toBeVisible();
 });
 
 test("b: add pasted text and wait until it is ready", async () => {
@@ -107,6 +109,7 @@ test("c: the guide gives a title, a summary and three question cards", async () 
   const guide = chatArticle(page, 0);
   await expect(guide.getByRole("button", { name: "Copy summary" })).toBeVisible({ timeout: MODEL_WAIT });
   await expect(guide.getByRole("heading", { level: 2 })).toHaveText(/\S/);
+  await expect.soft(guide.locator("[aria-hidden=true]").first()).toHaveText(/\S/); // the emoji above the title, if the model gave one
   await expect(guide.locator("p").nth(1)).toHaveText(/[\s\S]{80,}/); // the summary paragraph
   await expect(cards(guide)).toHaveCount(3);
 });
@@ -187,8 +190,16 @@ test("g: notes can be created, saved, renamed and removed", async () => {
   await expect(noteTitleInput(page)).toHaveValue(NOTE_TITLE);
   await expect(noteTextInput(page)).toHaveValue(NOTE_BODY);
 
-  // Rename through the three-dot menu: the title input that appears is the focused one.
-  await openNoteMenu(page, NOTE_TITLE, "Rename note");
+  // The three-dot menu has the grayed-out "Export to Docs" below the two working items (screenshot 5).
+  await page.getByRole("button", { name: `Actions for ${NOTE_TITLE}` }).click();
+  await expect(page.getByRole("button", { name: "Remove note", exact: true }).first()).toBeVisible();
+  const exportItem = page.getByRole("button", { name: "Export to Docs", exact: true });
+  await expect(exportItem).toHaveAttribute("aria-disabled", "true");
+  await exportItem.hover();
+  await expect(page.getByRole("tooltip").filter({ hasText: "Not part of this clone's scope" })).toBeVisible();
+
+  // Rename through the same menu: the title input that appears is the focused one.
+  await page.getByRole("button", { name: "Rename note", exact: true }).click();
   await expect(page.locator("input:focus")).toBeVisible();
   await page.locator("input:focus").fill(NOTE_RENAMED);
   await page.keyboard.press("Enter");
@@ -211,11 +222,29 @@ test("h: the right panel folds in and out", async () => {
   await expect(page.getByRole("button", { name: "Collapse panel", exact: true })).toBeVisible();
 });
 
-test("i: the grayed-out Websites chip explains itself", async () => {
+test("i: the Add sources popover matches the reference and grayed-out parts explain themselves", async () => {
   const dialog = await openAddSources(page);
-  await dialog.getByRole("button", { name: /Websites/ }).hover();
-  await expect(page.getByRole("tooltip").filter({ hasText: "Not part of this clone's scope" })).toBeVisible();
+  await expect(dialog.getByRole("heading", { name: /Create Audio and Video Overviews from\s*websites/ })).toBeVisible();
+  await expect(dialog.getByText("Search the web for new sources")).toBeVisible();
+  await expect(dialog.getByText("Fast Research")).toBeVisible();
+  await expect(dialog.getByText(/^\d+ \/ 50$/)).toBeVisible();
+
+  // Working chips are real buttons; the others are grayed out and say why on hover.
+  for (const name of ["Upload files", "Copied text"]) {
+    await expect(dialog.getByRole("button", { name })).not.toHaveAttribute("aria-disabled", "true");
+  }
+  for (const name of ["Websites", "Play Books", "Drive"]) {
+    const chip = dialog.getByRole("button", { name });
+    await expect(chip).toHaveAttribute("aria-disabled", "true");
+    await chip.hover();
+    await expect(page.getByRole("tooltip").filter({ hasText: "Not part of this clone's scope" })).toBeVisible();
+  }
   await closeAddSources(page);
+});
+
+test("i2: the Drive hint above the chat box can be dismissed", async () => {
+  await page.getByRole("button", { name: "Dismiss Drive hint" }).click();
+  await expect(page.getByText("You can now search Google Drive files from chat")).toBeHidden();
 });
 
 test("j: signing out lands on the start page", async () => {
