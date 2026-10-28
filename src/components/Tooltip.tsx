@@ -20,7 +20,6 @@ export function OutOfScope({ children }: { children: React.ReactNode }) {
       <button
         type="button"
         aria-disabled="true"
-        onClick={(e) => e.preventDefault()}
         className="cursor-not-allowed rounded-md border border-foreground/10 px-3 py-1.5 text-sm text-foreground/35"
       >
         {children}
