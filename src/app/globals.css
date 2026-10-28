@@ -23,6 +23,16 @@
   }
 }
 
+/* Landing page motion; disabled for reduced-motion users. */
+@media (prefers-reduced-motion: no-preference) {
+  .flow-dash { animation: flow-dash 6s linear infinite; }
+  .float-a { animation: float 7s ease-in-out infinite; }
+  .float-b { animation: float 9s ease-in-out -3s infinite; }
+  .float-c { animation: float 8s ease-in-out -5s infinite; }
+}
+@keyframes flow-dash { to { stroke-dashoffset: -142; } }
+@keyframes float { 50% { transform: translateY(-5px); } }
+
 body {
   background: var(--background);
   color: var(--foreground);
