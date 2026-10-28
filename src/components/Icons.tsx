@@ -32,6 +32,17 @@ const paths = {
   chart: "M5 20V10M12 20V4M19 20v-7",
   table: "M4 5h16v14H4zM4 10h16M4 15h16M10 5v14",
   sort: "M4 7h16M4 12h10M4 17h5",
+  undo: "M9 8L5 12l4 4M5 12h9a5 5 0 010 10h-2",
+  redo: "M15 8l4 4-4 4M19 12h-9a5 5 0 000 10h2",
+  bold: "M7 5h6a3.5 3.5 0 010 7H7zM7 12h7a3.5 3.5 0 010 7H7z",
+  italic: "M10 5h8M6 19h8M14 5l-4 14",
+  code: "M9 7l-5 5 5 5M15 7l5 5-5 5",
+  codeBlock: "M4 5h16v14H4zM10 9l-3 3 3 3M14 9l3 3-3 3",
+  bulletList: "M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01",
+  numberList: "M10 6h10M10 12h10M10 18h10M4 5l1.5-1v4M4 14h3l-3 4h3",
+  quote: "M5 17c0-4 1-6 4-7M13 17c0-4 1-6 4-7M4 17h5v-4M12 17h5v-4",
+  rule: "M5 12h14",
+  clearFormat: "M5 5h14M12 5l-2 14M8 19h8M4 20L20 4",
 } as const;
 
 export type IconName = keyof typeof paths;
