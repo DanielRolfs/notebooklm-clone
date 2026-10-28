@@ -60,7 +60,7 @@ const TOOLBAR: (IconName | "|" | "style")[] = [
 
 function NoteToolbar() {
   return (
-    <div className="flex items-center gap-0.5 border-b border-foreground/10 px-1 py-2">
+    <div className="flex flex-wrap items-center gap-y-1 gap-x-0.5 border-b border-foreground/10 px-1 py-2">
       {TOOLBAR.map((item, i) =>
         item === "|" ? (
           <span key={i} className="mx-2 h-4 w-px bg-foreground/15" />
