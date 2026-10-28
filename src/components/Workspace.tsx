@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Icon } from "./Icons";
 import { createClient } from "@/lib/supabase/client";
 import type { Guide } from "@/lib/guide";
@@ -62,12 +62,20 @@ export function Workspace({
     openNote(data.id);
   }
 
-  async function saveNote(id: string, fields: Partial<Note>) {
-    const { error } = await supabase
-      .from("notes")
-      .update({ ...fields, updated_at: new Date().toISOString() })
-      .eq("id", id);
-    setError(error ? `Could not save: ${error.message}` : "");
+  // Saves run one after another: leaving the title field and then the text field starts two requests,
+  // and a slow first one must never land after (and overwrite) the second.
+  const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
+
+  function saveNote(id: string, fields: Partial<Note>) {
+    const run = async () => {
+      const { error } = await supabase
+        .from("notes")
+        .update({ ...fields, updated_at: new Date().toISOString() })
+        .eq("id", id);
+      setError(error ? `Could not save: ${error.message}` : "");
+    };
+    saveQueue.current = saveQueue.current.then(run, run);
+    return saveQueue.current;
   }
 
   async function removeNote(id: string) {
