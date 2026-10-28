@@ -29,13 +29,13 @@ function CollapseButton({ onClick }: { onClick: () => void }) {
 export function StudioPanel({ onCollapse }: { onCollapse: () => void }) {
   return (
     <section className="flex min-h-0 flex-col rounded-3xl bg-panel p-4">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-3 flex h-6 items-center justify-between">
         <h2 className="text-[15px]">Studio</h2>
         <CollapseButton onClick={onCollapse} />
       </div>
-      <div className="mb-2 grid grid-cols-2 gap-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
         {tools.map(([name, icon]) => (
-          <OutOfScope key={name} block className="!rounded-xl border border-foreground/10 !px-2 !py-3 text-[13px]">
+          <OutOfScope key={name} block className="h-11 w-full !justify-start !rounded-xl border border-foreground/10 !px-2 !py-0 text-[13px] whitespace-nowrap">
             <Icon name={icon} className="size-4" /> {name}
           </OutOfScope>
         ))}
@@ -57,7 +57,7 @@ const TOOLBAR: (IconName | "|" | "style")[] = [
 
 function NoteToolbar() {
   return (
-    <div className="mb-3 flex items-center gap-0.5 border-b border-foreground/10 px-1 py-3">
+    <div className="flex items-center gap-0.5 border-b border-foreground/10 px-1 py-2">
       {TOOLBAR.map((item, i) =>
         item === "|" ? (
           <span key={i} className="mx-2 h-4 w-px bg-foreground/15" />
@@ -107,7 +107,7 @@ export function NoteEditor({
 
   return (
     <section className="flex min-h-0 flex-col rounded-3xl bg-panel p-4">
-      <div className="mb-4 flex items-center justify-between text-[15px]">
+      <div className="mb-2 flex h-6 items-center justify-between text-[15px]">
         <p>
           <span className="text-foreground/60">Studio</span> <span className="text-foreground/40">›</span> Note
         </p>
@@ -118,7 +118,7 @@ export function NoteEditor({
           <CollapseButton onClick={onCollapse} />
         </div>
       </div>
-      <div className="flex items-center gap-2 border-b border-foreground/10 pb-3">
+      <div className="flex items-center gap-2 border-b border-foreground/10 pb-2">
         <input
           value={note.title}
           onChange={(e) => onChange({ title: e.target.value })}
@@ -127,7 +127,7 @@ export function NoteEditor({
           placeholder="New Note"
           className="min-w-0 flex-1 bg-transparent text-2xl outline-none"
         />
-        <button onClick={onRemove} aria-label="Remove note" title="Remove note" className="rounded-full p-2 hover:bg-red-500/10">
+        <button onClick={onRemove} aria-label="Remove note" title="Remove note" className="rounded-full p-1.5 hover:bg-red-500/10">
           <Icon name="trash" className="size-5" />
         </button>
       </div>
@@ -138,7 +138,7 @@ export function NoteEditor({
         onBlur={flush}
         aria-label="Note text"
         placeholder="Write your note"
-        className="min-h-0 flex-1 resize-none px-1 py-3 text-[15px] outline-none"
+        className="min-h-0 flex-1 resize-none px-1 py-2 text-[15px] outline-none"
       />
     </section>
   );
