@@ -65,12 +65,12 @@ The UI shows the progress: the Sources list [re-reads the page every 3 seconds](
 
 ## 4. Asking a question (retrieval and answer)
 
-[POST /api/chat](src/app/api/chat/route.ts#L15-L52) validates the request (non-empty question, 1 to 50 Source ids, all belonging to the user) and then runs a small **LangGraph** with two nodes ([graph.ts](src/lib/chat/graph.ts#L60-L66)):
+[POST /api/chat](src/app/api/chat/route.ts#L15-L52) validates the request (non-empty question, 1 to 50 Source ids, all belonging to the user) and then runs a small **LangGraph** with two nodes ([graph.ts](src/lib/chat/graph.ts#L62-L68)):
 
-1. **retrieve** ([code](src/lib/chat/graph.ts#L23-L35)): embeds the question and calls `match_chunks` for the **top 8** Chunks of the ticked Sources.
-2. **generate** ([code](src/lib/chat/graph.ts#L48-L58)): sends the numbered Chunks and the question to Claude. If no Chunk matched, it answers "I do not know" without calling the model, because it could only guess.
+1. **retrieve** ([code](src/lib/chat/graph.ts#L25-L37)): embeds the question and calls `match_chunks` for the **top 8** Chunks of the ticked Sources.
+2. **generate** ([code](src/lib/chat/graph.ts#L50-L60)): sends the numbered Chunks and the question to Claude. If no Chunk matched, it answers "I do not know" without calling the model, because it could only guess.
 
-The [prompt](src/lib/chat/prompt.ts#L7-L19) numbers the Chunks `[1]`, `[2]`, … and tells the model to answer only from them and to cite the numbers.
+The [prompt](src/lib/chat/prompt.ts#L7-L20) numbers the Chunks `[1]`, `[2]`, … and treats them as the model's knowledge base: it should apply them to the user's own case, cite the numbers it builds on, and say when it goes beyond what the Sources state. It only says the Sources do not help when the excerpts are truly unrelated. The answer is generated with a small temperature (0.4) so the model can combine ideas; the other model calls stay at 0.
 
 **Streaming.** The route [streams](src/app/api/chat/route.ts#L56-L105) one JSON object per line (NDJSON): text pieces as they arrive, then the Citations (only the numbers the answer actually used, with Source title and a snippet), then three follow-up questions from a [second small model call](src/lib/chat/suggest.ts#L6-L18), or an error line. The browser reads it with [streamChat](src/lib/api.ts#L40) and shows the Citations on hover in the [ChatPanel](src/components/ChatPanel.tsx#L23-L40).
 
@@ -98,6 +98,7 @@ Like the real app, the notebook shows a title, a summary and three clickable que
 | **One OpenRouter key** for chat and embeddings | Anthropic has no embedding model; one key means one place to configure. | Anthropic plus a second provider. |
 | **Small LangGraph**, two nodes | Retrieval and generation are separate steps that can grow (rerank, tools). | A plain function would do today. |
 | **NDJSON over `fetch`** for streaming | Simple, works with `POST`, no extra library. | Server-sent events (GET only), WebSockets. |
+| **The model may apply the Sources, not only quote them** | A strict "answer only from the excerpts" rule made it refuse any use case the Sources do not spell out. Now it reasons with them and labels what goes beyond them. | A strict quote-only prompt. |
 | **Prompt-based citations** | OpenRouter has no native citations feature. | Provider citation APIs. |
 | **Store extracted text, not the file** | Chat only needs text; no file storage to secure. | Supabase Storage. |
 | **Ingestion inside the request** (60 s limit) | No queue or worker to run; fine for the size limits. | Background job queue. |

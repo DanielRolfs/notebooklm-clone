@@ -8,6 +8,8 @@ import { embedTexts } from "@/lib/openrouter/embeddings";
 import { buildSystemPrompt, type RetrievedChunk } from "./prompt";
 
 const TOP_K = 8;
+// A little freedom, so the model can apply the Sources to the user's case. The other model calls stay at 0.
+const ANSWER_TEMPERATURE = 0.4;
 
 const State = Annotation.Root({
   question: Annotation<string>(),
@@ -35,13 +37,13 @@ async function retrieve(state: typeof State.State, config?: RunnableConfig) {
 }
 
 // streaming: true makes LangGraph's "messages" stream mode emit tokens.
-export function openRouterModel(model: string, streaming: boolean) {
+export function openRouterModel(model: string, streaming: boolean, temperature = 0) {
   return new ChatOpenAI({
     model,
     apiKey: requireEnv("OPENROUTER_API_KEY", process.env.OPENROUTER_API_KEY),
     configuration: { baseURL: "https://openrouter.ai/api/v1" },
     streaming,
-    temperature: 0,
+    temperature,
   });
 }
 
@@ -50,7 +52,7 @@ async function generate(state: typeof State.State) {
   if (state.chunks.length === 0) {
     return { answer: "I do not know. The selected Sources have no passages that match your question." };
   }
-  const res = await openRouterModel(CHAT_MODEL, true).invoke([
+  const res = await openRouterModel(CHAT_MODEL, true, ANSWER_TEMPERATURE).invoke([
     { role: "system", content: buildSystemPrompt(state.chunks) },
     { role: "user", content: state.question },
   ]);
