@@ -5,30 +5,36 @@ import type { ReactNode } from "react";
 
 const BLUE = "#4fa0ff";
 
-// Connectors. All end at the hub's left edge (1729, 577).
+// Connectors. All end at the hub's left edge (1729, 577). The curves are fitted to pass exactly through the
+// reference's marker positions, and the markers below sit on them (position and angle along the curve).
 const lines = [
   "M1273 287 L1285 305", // web -> audio
   "M1285 446 L1308 464", // audio -> video
-  "M1344 489 C1450 520 1580 568 1729 577",
-  "M1393 446 C1440 485 1520 545 1729 577",
-  "M1344 577 L1729 577",
-  "M1320 682 C1400 625 1560 585 1729 577",
-  "M1423 682 C1480 640 1600 590 1729 577",
-  "M1268 880 C1290 840 1320 790 1337 770",
+  "M1380 430 C1490 552.1 1614.1 577 1729 577", // audio -> hub
+  "M1330 480 C1486.4 578.4 1659.1 577 1729 577", // video -> hub
+  "M1344 577 L1729 577", // video -> hub, straight
+  "M1316 696 C1357.1 641 1486.4 577 1729 577", // slides -> hub
+  "M1423 690 C1513.9 606.6 1593.2 577 1729 577", // slides -> hub
+  "M1268 880 C1290 840 1320 790 1337 770", // pdf -> up behind the caption chip
 ];
 
-// Markers on the lines: [x, y, shape].
-const markers: [number, number, "dot" | "diamond" | "square" | "capsule"][] = [
-  [1444, 489, "diamond"], [1485, 517, "capsule"], [1538, 562, "square"], [1621, 568, "dot"],
-  [1444, 577, "dot"], [1473, 577, "diamond"], [1399, 635, "capsule"], [1438, 619, "square"],
-  [1551, 605, "capsule"], [1289, 843, "dot"],
+type Shape = "dot" | "diamond" | "square" | "capsule";
+
+// Markers on the lines: [x, y, shape, angle in degrees along the line].
+const markers: [number, number, Shape, number][] = [
+  [1443.2, 488.9, "diamond", 37.3], [1484.8, 517.2, "capsule", 30.4], [1621.1, 567.8, "dot", 0],
+  [1538, 561, "square", 11.2],
+  [1444, 577, "dot", 0], [1473, 577, "diamond", 0],
+  [1399.1, 635, "capsule", -24.9], [1437.9, 619, "square", -19.5],
+  [1552, 605, "capsule", -21.4],
+  [1289.4, 842.3, "dot", 0],
 ];
 
-function Marker({ x, y, shape }: { x: number; y: number; shape: "dot" | "diamond" | "square" | "capsule" }) {
-  if (shape === "dot") return <circle cx={x} cy={y} r="3.6" />;
-  if (shape === "diamond") return <rect x={x - 4.5} y={y - 4.5} width="9" height="9" rx="1" transform={`rotate(45 ${x} ${y})`} />;
-  if (shape === "square") return <rect x={x - 4} y={y - 4} width="8" height="8" rx="1" />;
-  return <rect x={x - 8} y={y - 4} width="16" height="8" rx="4" transform={`rotate(25 ${x} ${y})`} />;
+function Marker({ x, y, shape, angle }: { x: number; y: number; shape: Shape; angle: number }) {
+  if (shape === "dot") return <circle cx={x} cy={y} r="4.2" />;
+  if (shape === "diamond") return <rect x={x - 4.4} y={y - 4.4} width="8.8" height="8.8" rx="1.2" transform={`rotate(${angle + 45} ${x} ${y})`} />;
+  if (shape === "square") return <rect x={x - 4.2} y={y - 4.2} width="8.4" height="8.4" rx="1.2" transform={`rotate(${angle} ${x} ${y})`} />;
+  return <rect x={x - 8.5} y={y - 4.2} width="17" height="8.4" rx="4.2" transform={`rotate(${angle} ${x} ${y})`} />;
 }
 
 function Card({ x, y, w, h, fill = "#f3f7fb", children }: { x: number; y: number; w: number; h: number; fill?: string; children: ReactNode }) {
@@ -45,11 +51,11 @@ const bar = (x: number, y: number, w: number) => <rect x={x} y={y} width={w} hei
 export function FlowDiagram() {
   return (
     <svg viewBox="980 130 1020 930" className="flow-svg block h-auto w-full overflow-hidden" role="img" aria-label="Sources flowing into one notebook">
-      <g fill="none" stroke={BLUE} strokeWidth="1.6">
+      <g fill="none" stroke={BLUE} strokeWidth="2">
         {lines.map((d) => <path key={d} d={d} />)}
       </g>
       <g fill={BLUE}>
-        {markers.map(([x, y, shape]) => <Marker key={`${x}-${y}`} x={x} y={y} shape={shape} />)}
+        {markers.map(([x, y, shape, angle]) => <Marker key={`${x}-${y}`} x={x} y={y} shape={shape} angle={angle} />)}
       </g>
 
       {/* web page card */}
