@@ -23,6 +23,7 @@ Send us your finished result as a reply to this email. As soon as we’ve review
    4. After uploading files
       1. LLM response
 3. Improve Initial Analysis (5 min)
+4. Grill with Docs (Matt Pocock Skill)(30 min)
 
 ## Basic AI Instructions:
 
