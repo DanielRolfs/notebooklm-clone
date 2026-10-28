@@ -11,9 +11,12 @@ async function errorMessage(res: Response): Promise<string> {
   return `Request failed (${res.status})`;
 }
 
-/** Contract: POST /api/sources. Multipart `file`, or JSON `{type:"text",title,text}`. */
+/**
+ * Contract: POST /api/sources. Multipart `file`, or JSON `{type:"text",title,text}`, or
+ * `{type:"website",url}` (the server tells a website from a YouTube link).
+ */
 export async function addSource(
-  input: { file: File } | { title: string; text: string },
+  input: { file: File } | { title: string; text: string } | { url: string },
 ): Promise<string> {
   let init: RequestInit;
   if ("file" in input) {
@@ -24,7 +27,9 @@ export async function addSource(
     init = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "text", title: input.title, text: input.text }),
+      body: JSON.stringify(
+        "url" in input ? { type: "website", url: input.url } : { type: "text", title: input.title, text: input.text },
+      ),
     };
   }
   const res = await fetch("/api/sources", init);

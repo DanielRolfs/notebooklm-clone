@@ -1,4 +1,4 @@
-export class NoCaptionsError extends Error {}
+export class YoutubeError extends Error {}
 
 const NO_CAPTIONS = "This video has no captions we can read.";
 const ID = /^[\w-]{11}$/;
@@ -44,7 +44,7 @@ export async function fetchYoutube(id: string): Promise<{ title: string; text: s
     `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}&format=json`,
     { signal: timeout() },
   ).catch(() => null);
-  if (!oembed?.ok) throw new Error("Could not find that YouTube video.");
+  if (!oembed?.ok) throw new YoutubeError("Could not find that YouTube video.");
   const title = String((await oembed.json().catch(() => null))?.title ?? "").trim() || `YouTube video ${id}`;
 
   const player = await fetch("https://www.youtube.com/youtubei/v1/player?prettyPrint=false", {
@@ -53,7 +53,7 @@ export async function fetchYoutube(id: string): Promise<{ title: string; text: s
     headers: { "content-type": "application/json", "user-agent": "com.google.android.youtube/20.10.38 (Linux; U; Android 14)" },
     body: JSON.stringify({ context: { client: { clientName: "ANDROID", clientVersion: "20.10.38" } }, videoId: id }),
   }).catch(() => null);
-  if (!player?.ok) throw new NoCaptionsError(NO_CAPTIONS);
+  if (!player?.ok) throw new YoutubeError(NO_CAPTIONS);
   const data = await player.json().catch(() => null);
   const track = pickCaptionTrack(data?.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? []);
 
@@ -62,14 +62,14 @@ export async function fetchYoutube(id: string): Promise<{ title: string; text: s
   try {
     captionUrl = new URL(track?.baseUrl ?? "");
   } catch {
-    throw new NoCaptionsError(NO_CAPTIONS);
+    throw new YoutubeError(NO_CAPTIONS);
   }
-  if (captionUrl.protocol !== "https:" || !captionUrl.hostname.endsWith(".youtube.com")) throw new NoCaptionsError(NO_CAPTIONS);
+  if (captionUrl.protocol !== "https:" || !captionUrl.hostname.endsWith(".youtube.com")) throw new YoutubeError(NO_CAPTIONS);
   captionUrl.searchParams.set("fmt", "json3");
 
   const res = await fetch(captionUrl, { signal: timeout() }).catch(() => null);
   const json = res?.ok ? await res.json().catch(() => null) : null;
   const text = json ? captionsToText(json) : "";
-  if (!text) throw new NoCaptionsError(NO_CAPTIONS);
+  if (!text) throw new YoutubeError(NO_CAPTIONS);
   return { title, text };
 }

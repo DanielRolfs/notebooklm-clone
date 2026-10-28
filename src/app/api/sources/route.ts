@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { MAX_FILE_BYTES, UnsupportedFileError, extractFileText } from "@/lib/ingest/extract";
+import { EmptyPageError, extractWebText } from "@/lib/ingest/extract-web";
+import { YoutubeError, fetchYoutube, parseYoutubeId } from "@/lib/ingest/extract-youtube";
 import { ingestText } from "@/lib/ingest/ingest-text";
+import { UnsafeUrlError, parseWebUrl, safeFetchText } from "@/lib/ingest/safe-fetch";
 import { createClient } from "@/lib/supabase/server";
 
 const MAX_SOURCES = 50;
@@ -24,7 +27,7 @@ export async function POST(request: Request) {
     .eq("notebook_id", notebook.id);
   if ((count ?? 0) >= MAX_SOURCES) return fail(`A Notebook holds at most ${MAX_SOURCES} Sources.`, 409);
 
-  let type: "file" | "text";
+  let type: "file" | "text" | "website" | "youtube";
   let title: string;
   let text: string;
   try {
@@ -37,15 +40,31 @@ export async function POST(request: Request) {
       text = await extractFileText(file.name, new Uint8Array(await file.arrayBuffer()));
     } else {
       const body = await request.json();
-      if (body?.type !== "text" || typeof body.text !== "string" || !body.text.trim()) {
-        return fail('Expected {"type":"text","title","text"} or a multipart file.', 400);
+      if (body?.type === "website") {
+        if (typeof body.url !== "string") return fail('Expected {"type":"website","url"}.', 400);
+        const url = parseWebUrl(body.url);
+        const videoId = parseYoutubeId(url);
+        if (videoId) {
+          type = "youtube";
+          ({ title, text } = await fetchYoutube(videoId));
+        } else {
+          type = "website";
+          const page = await safeFetchText(url.href);
+          ({ title, text } = extractWebText(page.body, url.hostname));
+        }
+      } else {
+        if (body?.type !== "text" || typeof body.text !== "string" || !body.text.trim()) {
+          return fail('Expected {"type":"text","title","text"}, {"type":"website","url"} or a multipart file.', 400);
+        }
+        type = "text";
+        title = typeof body.title === "string" && body.title.trim() ? body.title.trim() : "Pasted text";
+        text = body.text;
       }
-      type = "text";
-      title = typeof body.title === "string" && body.title.trim() ? body.title.trim() : "Pasted text";
-      text = body.text;
     }
   } catch (e) {
     if (e instanceof UnsupportedFileError) return fail(e.message, 415);
+    if (e instanceof UnsafeUrlError) return fail(e.message, 400);
+    if (e instanceof EmptyPageError || e instanceof YoutubeError) return fail(e.message, 422);
     return fail("Could not read the request or file.", 400);
   }
 
