@@ -303,6 +303,10 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
     }
   }
 
+  const pickFiles = () => {
+    if (!busy) fileInput.current?.click();
+  };
+
   const chip = (active: boolean) =>
     `flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${active ? "border-foreground/40 bg-foreground/[0.06]" : "border-foreground/15"}`;
 
@@ -321,7 +325,14 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
           </button>
         </div>
         <div className="mb-5 flex flex-wrap justify-center gap-2">
-          <button className={chip(mode === "upload")} onClick={() => setMode("upload")}>
+          <button
+            className={chip(mode === "upload")}
+            disabled={busy}
+            onClick={() => {
+              setMode("upload");
+              pickFiles();
+            }}
+          >
             <Icon name="upload" className="size-4" /> Upload files
           </button>
           <Tooltip text="Coming in a later step">
@@ -339,28 +350,36 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
           </button>
         </div>
 
+        {/* Always mounted, so the "Upload files" chip can open the picker from either mode. */}
+        <input
+          ref={fileInput}
+          type="file"
+          multiple
+          accept=".pdf,.txt,.md,text/plain,text/markdown,application/pdf"
+          hidden
+          onChange={(e) => {
+            const files = [...(e.target.files ?? [])];
+            e.target.value = ""; // lets the same file be picked again
+            submit(files.map((file) => ({ file })));
+          }}
+        />
         {mode === "upload" ? (
           <div
+            role="button"
+            tabIndex={0}
+            aria-label="Choose files"
+            onClick={pickFiles}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && pickFiles()}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
               e.stopPropagation(); // the column behind the dialog also accepts drops
               submit([...e.dataTransfer.files].map((file) => ({ file })));
             }}
-            className="flex h-56 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-foreground/25 text-center text-sm text-foreground/60"
+            className="flex h-56 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-foreground/25 text-center text-sm text-foreground/60 hover:bg-foreground/[0.03]"
           >
-            <input
-              ref={fileInput}
-              type="file"
-              multiple
-              accept=".pdf,.txt,.md,text/plain,text/markdown,application/pdf"
-              hidden
-              onChange={(e) => submit([...(e.target.files ?? [])].map((file) => ({ file })))}
-            />
-            <button disabled={busy} onClick={() => fileInput.current?.click()} aria-label="Choose files" className="disabled:opacity-50">
-              <Icon name="upload" className="size-7" />
-            </button>
-            <p>Drag &amp; drop your files to upload. Supported file types: pdf, txt, md</p>
+            <Icon name="upload" className="size-7" />
+            <p>Drag &amp; drop your files to upload, or click to choose. Supported file types: pdf, txt, md</p>
           </div>
         ) : (
           <form
