@@ -284,7 +284,8 @@ export function SourcesPanel({
 }
 
 function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: () => void; onAdded: () => void }) {
-  const [mode, setMode] = useState<"upload" | "text">("upload");
+  const [mode, setMode] = useState<"upload" | "website" | "text">("upload");
+  const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -335,16 +336,9 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
           >
             <Icon name="upload" className="size-4" /> Upload files
           </button>
-          <Tooltip text="Coming in a later step">
-            <button disabled className={`${chip(false)} cursor-not-allowed opacity-40`}>
-              <Icon name="link" className="size-4" /> Websites
-            </button>
-          </Tooltip>
-          <Tooltip text="Coming in a later step">
-            <button disabled className={`${chip(false)} cursor-not-allowed opacity-40`}>
-              <Icon name="play" className="size-4 text-red-600" /> YouTube
-            </button>
-          </Tooltip>
+          <button className={chip(mode === "website")} onClick={() => setMode("website")}>
+            <Icon name="link" className="size-4" /> <Icon name="play" className="size-4 text-red-600" /> Websites
+          </button>
           <button className={chip(mode === "text")} onClick={() => setMode("text")}>
             <Icon name="clipboard" className="size-4" /> Copied text
           </button>
@@ -381,6 +375,27 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
             <Icon name="upload" className="size-7" />
             <p>Drag &amp; drop your files to upload, or click to choose. Supported file types: pdf, txt, md</p>
           </div>
+        ) : mode === "website" ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              submit([{ url: url.trim() }]);
+            }}
+            className="flex flex-col gap-2"
+          >
+            <input
+              required
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://"
+              className="rounded-xl border border-foreground/20 bg-transparent px-3 py-2 text-sm"
+            />
+            <p className="text-sm text-foreground/60">Paste a website or YouTube link</p>
+            <button disabled={busy} className="self-end rounded-full bg-foreground px-5 py-2 text-sm text-background disabled:opacity-50">
+              Insert
+            </button>
+          </form>
         ) : (
           <form
             onSubmit={(e) => {
