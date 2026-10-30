@@ -41,7 +41,7 @@ Stack: Next.js 16 (App Router, TypeScript, Tailwind), Supabase (Google login, Po
 | 4. Grill with Docs (Matt Pocock skill)     | 30 min        |
 | 5. Build, review and deploy with AI agents | 2 h 30 min    |
 | 6. Test and fix                            | 1 h 15 min    |
-| 7. Review Readme & Final tests             | 30 min        |
+| 7. Review Readme & Final tests             | 45 min        |
 | **Total**                                  | **about 5 h** |
 
 Step 5 is wall-clock time from the first commit of the build (15:19) to the last feature merge (about 17:20) plus writing these docs. A manager session handed out the work, subagents built the branches in parallel, and I tested every pull request on its Vercel preview before it was merged: 15 pull requests (this documentation one included), 14 merged and one closed (website and YouTube import).

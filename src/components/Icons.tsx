@@ -17,6 +17,7 @@ const paths = {
   research: "M10 4a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM19 19l-4.2-4.2M18 2l.8 1.9 1.9.8-1.9.8L18 7.4l-.8-1.9-1.9-.8 1.9-.8z",
   drive: "M9 4h6l6 10-3 5H6l-3-5zM9 4l6 10M15 4L9 14M3 14h18",
   docFile: "M5 4h14v16H5zM9 10h6M9 14h4",
+  arrowLeft: "M19 12H5M11 6l-6 6 6 6",
   arrowRight: "M5 12h14M13 6l6 6-6 6",
   arrowUp: "M12 19V5M6 11l6-6 6 6",
   copy: "M9 9h10v11H9zM5 15V4h10",

@@ -321,7 +321,6 @@ export function SourcesPanel({
 
 function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: () => void; onAdded: () => void }) {
   const [mode, setMode] = useState<"upload" | "text">("upload");
-  const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -347,6 +346,52 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
     `flex items-center gap-3 rounded-full border px-5 py-2.5 text-base ${active ? "border-foreground/40 bg-foreground/[0.06]" : "border-foreground/15"}`;
   // Chips for sources this clone cannot take: same look, grayed out, tooltip on hover.
   const outOfScope = "!gap-3 border border-foreground/15 !px-5 !py-2.5 !text-base [&_svg]:opacity-50";
+
+  if (mode === "text") {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4" onClick={onClose}>
+        <form
+          role="dialog"
+          aria-label="Paste copied text"
+          onClick={(e) => e.stopPropagation()}
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit([{ title: "", text }]);
+          }}
+          className="my-auto w-full max-w-3xl rounded-[28px] bg-panel p-6 shadow-xl"
+        >
+          <div className="mb-5 flex items-center justify-between">
+            <div className="flex items-center gap-5">
+              <button type="button" onClick={() => setMode("upload")} aria-label="Back" className="p-1">
+                <Icon name="arrowLeft" />
+              </button>
+              <h3 className="text-[28px] font-normal leading-10">Paste copied text</h3>
+            </div>
+            <button type="button" onClick={onClose} aria-label="Close" className="text-foreground/60">
+              <Icon name="close" />
+            </button>
+          </div>
+          <p className="mb-5 text-base">Paste your copied text below to upload as a source in this Notebook.</p>
+          <textarea
+            autoFocus
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Paste text here"
+            className={`h-80 w-full resize-y rounded-2xl border bg-transparent px-5 py-4 text-base outline-none placeholder:text-foreground/50 ${text.trim() ? "border-foreground/30" : "border-red-700"}`}
+          />
+          {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+          <div className="mt-6 flex justify-end">
+            <button
+              disabled={busy || !text.trim()}
+              className="rounded-full bg-foreground px-8 py-3 text-base text-background disabled:bg-foreground/10 disabled:text-foreground/50"
+            >
+              {busy ? "Inserting..." : "Insert"}
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4" onClick={onClose}>
@@ -390,7 +435,7 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
           <OutOfScope className={outOfScope}>
             <Icon name="drive" className="size-5" /> Drive
           </OutOfScope>
-          <button className={chip(mode === "text")} onClick={() => setMode("text")}>
+          <button className={chip(false)} onClick={() => setMode("text")}>
             <Icon name="clipboard" className="size-5" /> Copied text
           </button>
         </div>
@@ -408,52 +453,23 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
             submit(files.map((file) => ({ file })));
           }}
         />
-        {mode === "upload" ? (
-          <div
-            role="button"
-            tabIndex={0}
-            aria-label="Choose files"
-            onClick={pickFiles}
-            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && pickFiles()}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation(); // the column behind the dialog also accepts drops
-              submit([...e.dataTransfer.files].map((file) => ({ file })));
-            }}
-            className="flex h-56 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-foreground/25 text-center text-sm text-foreground/60 hover:bg-foreground/[0.03]"
-          >
-            <Icon name="upload" className="size-7" />
-            <p>Drag &amp; drop your files to upload, or click to choose. Supported file types: pdf, txt, md</p>
-          </div>
-        ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              submit([{ title: title.trim(), text }]);
-            }}
-            className="flex flex-col gap-2"
-          >
-            <input
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Title"
-              className="rounded-xl border border-foreground/20 bg-transparent px-3 py-2 text-sm"
-            />
-            <textarea
-              required
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Paste text here"
-              rows={8}
-              className="rounded-xl border border-foreground/20 bg-transparent px-3 py-2 text-sm"
-            />
-            <button disabled={busy} className="self-end rounded-full bg-foreground px-5 py-2 text-sm text-background disabled:opacity-50">
-              Insert
-            </button>
-          </form>
-        )}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label="Choose files"
+          onClick={pickFiles}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && pickFiles()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation(); // the column behind the dialog also accepts drops
+            submit([...e.dataTransfer.files].map((file) => ({ file })));
+          }}
+          className="flex h-56 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-foreground/25 text-center text-sm text-foreground/60 hover:bg-foreground/[0.03]"
+        >
+          <Icon name="upload" className="size-7" />
+          <p>Drag &amp; drop your files to upload, or click to choose. Supported file types: pdf, txt, md</p>
+        </div>
 
         {busy && <p className="mt-3 text-sm text-foreground/60">Uploading...</p>}
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}

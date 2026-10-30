@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 // One serial flow: the steps share the user, the Notebook and one browser page (the chat lives in page state).
 test.describe.configure({ mode: "serial" });
 
-const SOURCE_TITLE = "Zorblax method";
+const SOURCE_TITLE = "Pasted text"; // the default name for pasted text
 const NOTE_TITLE = "Zorblax workshop plan";
 const NOTE_RENAMED = "Zorblax renamed";
 const NOTE_BODY = "Remember the Quonk review and the Glimmer round.";
@@ -93,7 +93,6 @@ test("a: empty state", async () => {
 test("b: add pasted text and wait until it is ready", async () => {
   const dialog = await openAddSources(page);
   await dialog.getByRole("button", { name: "Copied text" }).click();
-  await dialog.getByPlaceholder("Title").fill(SOURCE_TITLE);
   await dialog.getByPlaceholder("Paste text here").fill(ZORBLAX_TEXT);
   await dialog.getByRole("button", { name: "Insert" }).click();
 
