@@ -2,7 +2,7 @@
 
 A small clone of [Google NotebookLM](https://notebooklm.google.com). You sign in with Google, add **Sources** (files or pasted text), write **Notes**, and chat with an AI that answers from your Sources and cites them.
 
-- **Live demo:** https://notebooklm-clone-danielrolfs-projects.vercel.app
+- **Live demo:** https://notebooklm-clone-azure.vercel.app/welcome
 - **How it works under the hood:** [TECHNICAL.md](TECHNICAL.md) (with links into the code and the reasons behind each decision)
 - **Plan and scope:** [initialAnalysis.md](initialAnalysis.md) (my first analysis) and [llmImprovedAnalysis.md](llmImprovedAnalysis.md) (the improved version)
 
