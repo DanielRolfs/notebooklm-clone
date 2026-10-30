@@ -8,6 +8,11 @@ describe("parseGuideOutput", () => {
     const r = parseGuideOutput("```json\n" + JSON.stringify(ok) + "\n```");
     expect(r).toEqual({ title: "My Title", summary: "A **bold** summary.", suggestions: ["a", "b", "c"] });
   });
+  it("keeps a real emoji and drops anything else", () => {
+    expect(parseGuideOutput(JSON.stringify({ ...ok, emoji: " 📈 " }))?.emoji).toBe("📈");
+    expect(parseGuideOutput(JSON.stringify({ ...ok, emoji: "chart" }))?.emoji).toBeUndefined();
+    expect(parseGuideOutput(JSON.stringify(ok))?.emoji).toBeUndefined();
+  });
   it("cuts long questions to 90 characters", () => {
     const r = parseGuideOutput(JSON.stringify({ ...ok, suggestions: ["x".repeat(200), "b", "c"] }));
     expect(r?.suggestions[0]).toHaveLength(90);

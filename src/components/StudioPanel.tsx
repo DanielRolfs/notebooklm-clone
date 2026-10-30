@@ -138,7 +138,6 @@ export function NoteEditor({
         onChange={(e) => onChange({ content: e.target.value })}
         onBlur={flush}
         aria-label="Note text"
-        placeholder="Write your note"
         className="min-h-0 flex-1 resize-none px-1 py-2 text-base outline-none"
       />
     </section>

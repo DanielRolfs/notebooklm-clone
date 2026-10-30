@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { addSource } from "@/lib/api";
 import { Icon, type IconName } from "./Icons";
+import { PlayBooksIcon, YouTubeIcon } from "./BrandIcons";
 import { OutOfScope, Tooltip } from "./Tooltip";
 
 export type Source = {
@@ -35,30 +36,65 @@ function SourceIcon({ source }: { source: Source }) {
   );
 }
 
-// Three-dot menu; the full-screen button behind it closes it on any outside click.
-function RowMenu({ label, items }: { label: string; items: { text: string; icon: IconName; run: () => void }[] }) {
+// Grayed-out "Search the web" box. Shown in the Sources column and again in the Add sources dialog.
+function WebSearchBox({ large = false }: { large?: boolean }) {
+  const pill = `flex items-center gap-1.5 rounded-full bg-panel ${large ? "px-4 py-2.5 text-base" : "px-3 py-1.5"}`;
+  return (
+    <Tooltip text="Not part of this clone's scope" block>
+      <div aria-disabled="true" className={`w-full cursor-not-allowed rounded-3xl bg-foreground/[0.06] text-foreground/35 ${large ? "p-6" : "mb-3 p-4"}`}>
+        <p className={large ? "mb-6 text-lg" : "mb-4"}>Search the web for new sources</p>
+        <div className="flex items-center gap-2">
+          <span className={`${pill} shrink-0`}>
+            <Icon name="globe" className="size-4 shrink-0" /> Web <Icon name="chevron" className="size-3.5 shrink-0" />
+          </span>
+          <span className={`${pill} min-w-0`}>
+            <Icon name="research" className="size-4 shrink-0" /> <span className="min-w-0 truncate">Fast Research</span> <Icon name="chevron" className="size-3.5 shrink-0" />
+          </span>
+          <Icon name="arrowRight" className="ml-auto size-4 shrink-0" />
+        </div>
+      </div>
+    </Tooltip>
+  );
+}
+
+type MenuItem = { text: string; icon: IconName; run?: () => void }; // no `run`: shown grayed out
+
+// Three-dot menu, visible while the row is hovered; the full-screen button behind it closes it on any outside click.
+function RowMenu({ label, items }: { label: string; items: MenuItem[] }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)} aria-label={label} className="rounded-full p-1 text-foreground/60 hover:bg-foreground/10">
+      <button
+        onClick={() => setOpen(!open)}
+        aria-label={label}
+        className={`rounded-full p-1 text-foreground/60 hover:bg-foreground/10 focus-visible:opacity-100 group-hover/row:opacity-100 [@media(hover:none)]:opacity-100 ${open ? "opacity-100" : "opacity-0"}`}
+      >
         <Icon name="more" className="size-4" />
       </button>
       {open && (
         <>
           <button aria-label="Close menu" className="fixed inset-0 z-30 cursor-default" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-40 mt-1 w-48 rounded-2xl border border-foreground/10 bg-panel py-2 shadow-lg">
-            {items.map((item) => (
-              <button
-                key={item.text}
-                className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-foreground/5"
-                onClick={() => {
-                  setOpen(false);
-                  item.run();
-                }}
-              >
-                <Icon name={item.icon} className="size-4" /> {item.text}
-              </button>
-            ))}
+          <div className="absolute right-0 top-full z-40 mt-1 w-52 rounded-2xl border border-foreground/10 bg-panel py-2 shadow-lg">
+            {items.map((item) =>
+              item.run ? (
+                <button
+                  key={item.text}
+                  className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-foreground/5"
+                  onClick={() => {
+                    setOpen(false);
+                    item.run?.();
+                  }}
+                >
+                  <Icon name={item.icon} className="size-4" /> {item.text}
+                </button>
+              ) : (
+                <Tooltip key={item.text} text="Not part of this clone's scope" block>
+                  <button type="button" aria-disabled="true" className="flex w-full cursor-not-allowed items-center gap-3 px-4 py-2 text-left text-foreground/35">
+                    <Icon name={item.icon} className="size-4" /> {item.text}
+                  </button>
+                </Tooltip>
+              ),
+            )}
           </div>
         </>
       )}
@@ -170,20 +206,7 @@ export function SourcesPanel({
         </button>
       </div>
 
-      <Tooltip text="Not part of this clone's scope" block>
-        <div aria-disabled="true" className="mb-3 w-full cursor-not-allowed rounded-3xl bg-foreground/[0.06] p-4 text-foreground/35">
-          <p className="mb-4">Search the web for new sources</p>
-          <div className="flex items-center gap-2">
-            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-panel px-3 py-1.5">
-              <Icon name="globe" className="size-4 shrink-0" /> Web <Icon name="chevron" className="size-3.5 shrink-0" />
-            </span>
-            <span className="flex min-w-0 items-center gap-1.5 rounded-full bg-panel px-3 py-1.5">
-              <Icon name="search" className="size-4 shrink-0" /> <span className="min-w-0 truncate">Fast Research</span> <Icon name="chevron" className="size-3.5 shrink-0" />
-            </span>
-            <Icon name="arrowRight" className="ml-auto size-4 shrink-0" />
-          </div>
-        </div>
-      </Tooltip>
+      <WebSearchBox />
 
       {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
       {uploading && <p className="mb-2 text-xs text-foreground/60">Uploading...</p>}
@@ -227,7 +250,7 @@ export function SourcesPanel({
                 notes.map((n) => (
                   <div
                     key={n.id}
-                    className={`flex h-9 items-center gap-3.5 rounded-lg pl-2.5 pr-2 ${n.id === openNoteId ? "bg-foreground/[0.07]" : "hover:bg-foreground/5"}`}
+                    className={`group/row flex h-9 items-center gap-3.5 rounded-lg pl-2.5 pr-2 ${n.id === openNoteId ? "bg-foreground/[0.07]" : "hover:bg-foreground/5"}`}
                   >
                     <Icon name="note" className="size-5" />
                     {renamingId === n.id ? (
@@ -252,6 +275,7 @@ export function SourcesPanel({
                       items={[
                         { text: "Remove note", icon: "trash", run: () => onRemoveNote(n.id) },
                         { text: "Rename note", icon: "pencil", run: () => setRenamingId(n.id) },
+                        { text: "Export to Docs", icon: "docFile" },
                       ]}
                     />
                     {/* Notes are not chat context in this clone, so the box is shown ticked and inert. */}
@@ -262,7 +286,7 @@ export function SourcesPanel({
           )}
 
           {sources.map((s) => (
-            <div key={s.id} className="flex h-9 items-center gap-3.5 rounded-lg pl-2.5 pr-2 hover:bg-foreground/5">
+            <div key={s.id} className="group/row flex h-9 items-center gap-3.5 rounded-lg pl-2.5 pr-2 hover:bg-foreground/5">
               <SourceIcon source={s} />
               <span className="min-w-0 flex-1 truncate" title={s.title}>
                 {s.title}
@@ -320,41 +344,54 @@ function AddSourceDialog({ count, onClose, onAdded }: { count: number; onClose: 
   };
 
   const chip = (active: boolean) =>
-    `flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${active ? "border-foreground/40 bg-foreground/[0.06]" : "border-foreground/15"}`;
+    `flex items-center gap-3 rounded-full border px-5 py-2.5 text-base ${active ? "border-foreground/40 bg-foreground/[0.06]" : "border-foreground/15"}`;
+  // Chips for sources this clone cannot take: same look, grayed out, tooltip on hover.
+  const outOfScope = "!gap-3 border border-foreground/15 !px-5 !py-2.5 !text-base [&_svg]:opacity-50";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4" onClick={onClose}>
       <div
         role="dialog"
         aria-label="Add sources"
-        className="w-full max-w-2xl rounded-3xl bg-panel p-6 shadow-xl"
+        className="my-auto w-full max-w-3xl rounded-3xl bg-panel p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-5 flex items-start justify-between">
-          <h3 className="flex-1 pl-6 text-center text-2xl">Add sources</h3>
+        <div className="mb-6 flex items-start justify-between">
+          <h3 className="flex-1 pl-6 text-center text-[28px] font-normal leading-10">
+            Create Audio and Video Overviews from
+            <br />
+            <span className="text-blue-500">websites</span>
+          </h3>
           <button onClick={onClose} aria-label="Close" className="text-foreground/60">
             <Icon name="close" />
           </button>
         </div>
-        <div className="mb-5 flex flex-wrap justify-center gap-2">
+        <div className="mb-5">
+          <WebSearchBox large />
+        </div>
+        <div className="mb-5 flex flex-wrap justify-center gap-3">
           <button
-            className={chip(mode === "upload")}
+            className={chip(false)}
             disabled={busy}
             onClick={() => {
               setMode("upload");
               pickFiles();
             }}
           >
-            <Icon name="upload" className="size-4" /> Upload files
+            <Icon name="upload" className="size-5" /> Upload files
           </button>
-          <Tooltip text="Not part of this clone's scope">
-            <button disabled className={`${chip(false)} cursor-not-allowed opacity-40`}>
-              <Icon name="link" className="size-4" />
-              <Icon name="play" className="size-4 text-red-600" /> Websites
-            </button>
-          </Tooltip>
+          <OutOfScope className={outOfScope}>
+            <Icon name="link" className="size-5" />
+            <YouTubeIcon className="size-5" /> Websites
+          </OutOfScope>
+          <OutOfScope className={outOfScope}>
+            <PlayBooksIcon className="size-5" /> Play Books
+          </OutOfScope>
+          <OutOfScope className={outOfScope}>
+            <Icon name="drive" className="size-5" /> Drive
+          </OutOfScope>
           <button className={chip(mode === "text")} onClick={() => setMode("text")}>
-            <Icon name="clipboard" className="size-4" /> Copied text
+            <Icon name="clipboard" className="size-5" /> Copied text
           </button>
         </div>
 
