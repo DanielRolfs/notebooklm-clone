@@ -113,6 +113,8 @@ export function SourcesPanel({
   onOpenNote,
   onRenameNote,
   onRemoveNote,
+  openSourceId,
+  onOpenSource,
 }: {
   sources: Source[];
   selected: Set<string>;
@@ -124,6 +126,8 @@ export function SourcesPanel({
   onOpenNote: (id: string) => void;
   onRenameNote: (id: string, title: string) => void;
   onRemoveNote: (id: string) => void;
+  openSourceId: string | null;
+  onOpenSource: (id: string) => void;
 }) {
   const router = useRouter();
   const [dialog, setDialog] = useState(false);
@@ -286,11 +290,19 @@ export function SourcesPanel({
           )}
 
           {sources.map((s) => (
-            <div key={s.id} className="group/row flex h-9 items-center gap-3.5 rounded-lg pl-2.5 pr-2 hover:bg-foreground/5">
+            <div
+              key={s.id}
+              className={`group/row flex h-9 items-center gap-3.5 rounded-lg pl-2.5 pr-2 ${s.id === openSourceId ? "bg-foreground/[0.07]" : "hover:bg-foreground/5"}`}
+            >
               <SourceIcon source={s} />
-              <span className="min-w-0 flex-1 truncate" title={s.title}>
+              <button
+                onClick={() => onOpenSource(s.id)}
+                disabled={s.status !== "ready"}
+                className="min-w-0 flex-1 truncate text-left"
+                title={s.title}
+              >
                 {s.title}
-              </span>
+              </button>
               {s.status !== "ready" && <span className={`rounded px-1.5 py-0.5 text-xs ${badge[s.status]}`}>{s.status}</span>}
               <RowMenu label={`Actions for ${s.title}`} items={[{ text: "Remove source", icon: "trash", run: () => remove(s.id) }]} />
               <input

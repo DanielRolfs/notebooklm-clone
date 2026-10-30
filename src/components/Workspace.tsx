@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Guide } from "@/lib/guide";
 import { ChatPanel } from "./ChatPanel";
 import { SourcesPanel, type Note, type Source } from "./SourcesPanel";
-import { NoteEditor, StudioPanel } from "./StudioPanel";
+import { NoteEditor, SourceViewer, StudioPanel } from "./StudioPanel";
 
 // Holds the ticked Sources (Sources column sets them, Chat reads them) and the Notes
 // (listed in the Sources column, edited in the right column).
@@ -26,11 +26,13 @@ export function Workspace({
   const [unticked, setUnticked] = useState<Set<string>>(new Set());
   const [notes, setNotes] = useState(initialNotes);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [openSourceId, setOpenSourceId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [collapsed, setCollapsed] = useState(false);
   const selected = new Set(sources.filter((s) => s.status === "ready" && !unticked.has(s.id)).map((s) => s.id));
   const readyIds = sources.filter((s) => s.status === "ready").map((s) => s.id).sort();
   const open = notes.find((n) => n.id === openId);
+  const openSource = sources.find((s) => s.id === openSourceId);
 
   const toggle = (id: string) =>
     setUnticked((prev) => {
@@ -47,6 +49,12 @@ export function Workspace({
   // Opening a note always shows the right column.
   const openNote = (id: string) => {
     setOpenId(id);
+    setOpenSourceId(null);
+    setCollapsed(false);
+  };
+  const openSourceView = (id: string) => {
+    setOpenSourceId(id);
+    setOpenId(null);
     setCollapsed(false);
   };
 
@@ -83,7 +91,7 @@ export function Workspace({
       className={`grid min-h-0 flex-1 grid-cols-1 gap-3 px-3 pb-3 transition-[grid-template-columns] duration-300 ${
         collapsed
           ? "lg:grid-cols-[minmax(280px,25%)_minmax(0,1fr)_40px]"
-          : open
+          : open || openSource
             ? "lg:grid-cols-[minmax(260px,21%)_minmax(0,1fr)_minmax(360px,37%)]"
             : "lg:grid-cols-[minmax(280px,25%)_minmax(0,1fr)_minmax(320px,25%)]"
       }`}
@@ -102,6 +110,8 @@ export function Workspace({
           saveNote(id, { title });
         }}
         onRemoveNote={removeNote}
+        openSourceId={openSourceId}
+        onOpenSource={openSourceView}
       />
       <ChatPanel sourceIds={[...selected]} readyIds={readyIds} guide={guide} />
       <div className="relative min-h-0 lg:overflow-hidden">
@@ -125,6 +135,13 @@ export function Workspace({
             onSave={(fields) => saveNote(open.id, fields)}
             onRemove={() => removeNote(open.id)}
             onClose={() => setOpenId(null)}
+            onCollapse={() => setCollapsed(true)}
+          />
+        ) : openSource ? (
+          <SourceViewer
+            key={openSource.id}
+            source={openSource}
+            onClose={() => setOpenSourceId(null)}
             onCollapse={() => setCollapsed(true)}
           />
         ) : (
