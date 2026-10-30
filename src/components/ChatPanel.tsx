@@ -41,13 +41,13 @@ function Answer({ text, citations }: { text: string; citations: Citation[] }) {
 
 function SuggestionCards({ items, onAsk, disabled }: { items: string[]; onAsk: (q: string) => void; disabled: boolean }) {
   return (
-    <div className="mt-8 grid gap-3 sm:grid-cols-3">
+    <div className="mt-8 grid shrink-0 grid-cols-[repeat(auto-fit,minmax(12rem,1fr))] gap-3">
       {items.map((q) => (
         <button
           key={q}
           onClick={() => onAsk(q)}
           disabled={disabled}
-          className="flex min-h-32 flex-col justify-between gap-4 rounded-3xl bg-foreground/[0.06] p-5 text-left hover:bg-foreground/10 disabled:opacity-50"
+          className="flex h-auto min-h-32 min-w-0 flex-col justify-between gap-4 break-words rounded-3xl bg-foreground/[0.06] p-5 text-left hover:bg-foreground/10 disabled:opacity-50"
         >
           {q}
           <Icon name="cornerDownRight" className="size-4" />
