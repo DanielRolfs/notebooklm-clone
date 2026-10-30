@@ -42,11 +42,14 @@ Stack: Next.js 16 (App Router, TypeScript, Tailwind), Supabase (Google login, Po
 | 5. Build, review and deploy with AI agents | 2 h 30 min    |
 | 6. Test and fix                            | 1 h 15 min    |
 | 7. Review Readme & Final tests             | 45 min        |
-| **Total**                                  | **about 5 h** |
+| 8. Code review with the Rech reviewer      | 10 min        |
+| **Total**                                  | **about 6 h** |
 
 Step 5 is wall-clock time from the first commit of the build (15:19) to the last feature merge (about 17:20) plus writing these docs. A manager session handed out the work, subagents built the branches in parallel, and I tested every pull request on its Vercel preview before it was merged: 15 pull requests (this documentation one included), 14 merged and one closed (website and YouTube import).
 
 Step 6 is wall-clock time from the README update that added step 5 (17:28) to the end of the match-the-screenshots pass (about 18:45). It covers the UI parity and font fixes, the responsive panels, the Playwright tests (logged-out, signed-in and layout) and a click-through of the whole app against the six screenshots. That pass added the missing controls, for example the title, search box, Play Books and Drive chips in the Add sources popover, the grayed-out Export to Docs item, the Drive hint above the chat box, and the emoji above the guide title.
+
+Step 8 is a review of the whole codebase with the multi-agent code-review skill by Jonas Rech. I ran it on `main` (the whole tree against the empty tree, 80 files). It uses code, security and architecture reviewers plus completeness, test-coverage and lockfile checks. The result: no critical findings. The main follow-ups are a database-level cap for the 50 Sources, size and rate limits on the paid endpoints, generic error messages, and more tests. The full report is in [code-review-main-2026-10-30.md](code-review-main-2026-10-30.md).
 
 ## Setup
 
