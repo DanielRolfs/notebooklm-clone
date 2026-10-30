@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Icon, type IconName } from "./Icons";
 import { OutOfScope } from "./Tooltip";
-import { createClient } from "@/lib/supabase/client";
-import type { Note, Source } from "./SourcesPanel";
+import type { Note } from "./SourcesPanel";
 
 // Label, icon and icon color of the reference tiles; the faded icons keep their hue.
 const tools: [string, IconName, string][] = [
@@ -141,57 +140,6 @@ export function NoteEditor({
         aria-label="Note text"
         className="min-h-0 flex-1 resize-none px-1 py-2 text-base outline-none"
       />
-    </section>
-  );
-}
-
-// Read-only view of a Source's extracted text, loaded when the Source is opened.
-export function SourceViewer({
-  source,
-  onClose,
-  onCollapse,
-}: {
-  source: Source;
-  onClose: () => void;
-  onCollapse: () => void;
-}) {
-  const [text, setText] = useState<string | null>(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let live = true;
-    createClient()
-      .from("sources")
-      .select("extracted_text")
-      .eq("id", source.id)
-      .single()
-      .then(({ data, error }) => {
-        if (!live) return;
-        if (error) setError(error.message);
-        else setText(data.extracted_text ?? "");
-      });
-    return () => {
-      live = false;
-    };
-  }, [source.id]);
-
-  return (
-    <section className="flex min-h-0 flex-col rounded-3xl bg-panel p-4">
-      <div className="mb-2 flex h-6 items-center justify-between">
-        <p className="flex items-center gap-1">
-          <button onClick={onClose} className="rounded px-1 hover:bg-foreground/10">
-            Studio
-          </button>
-          <Icon name="chevronRight" className="size-4 text-foreground/60" /> Source
-        </p>
-        <CollapseButton onClick={onCollapse} icon="shrink" />
-      </div>
-      <h2 className="truncate border-b border-foreground/10 pb-2 text-2xl leading-8" title={source.title}>
-        {source.title}
-      </h2>
-      <div className="min-h-0 flex-1 overflow-y-auto whitespace-pre-wrap px-1 py-2 text-base" aria-label="Source text">
-        {error ? <span className="text-red-600">{error}</span> : text ?? <span className="text-foreground/60">Loading...</span>}
-      </div>
     </section>
   );
 }
