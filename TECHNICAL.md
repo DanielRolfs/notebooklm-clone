@@ -40,12 +40,13 @@ embed → store          generate (streamed)      sources → title, summary,
 
 Defined in [the first migration](supabase/migrations/20261028150000_init.sql):
 
-| Table | Holds | Notes |
-| --- | --- | --- |
-| `notebooks` | one row per user | `user_id` is unique; a [trigger](supabase/migrations/20261028150000_init.sql#L47-L61) creates it at first sign-in. A later [migration](supabase/migrations/20261028160000_notebook_guide.sql) adds the `guide` JSON column. |
-| `sources` | uploaded file or pasted text | stores the **extracted text**, not the original file; `status` is `pending`, `processing`, `ready` or `failed` |
-| `chunks` | passages of a source | `embedding vector(1536)` with an [HNSW index](supabase/migrations/20261028150000_init.sql#L34) for cosine search; `notebook_id` is copied onto each chunk so security and search need no join |
-| `notes` | the user's notes | plain text, title plus content |
+
+| Table       | Holds                        | Notes                                                                                                                                                                                                                       |
+| ------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `notebooks` | one row per user             | `user_id` is unique; a [trigger](supabase/migrations/20261028150000_init.sql#L47-L61) creates it at first sign-in. A later [migration](supabase/migrations/20261028160000_notebook_guide.sql) adds the `guide` JSON column. |
+| `sources`   | uploaded file or pasted text | stores the **extracted text**, not the original file; `status` is `pending`, `processing`, `ready` or `failed`                                                                                                              |
+| `chunks`    | passages of a source         | `embedding vector(1536)` with an [HNSW index](supabase/migrations/20261028150000_init.sql#L34) for cosine search; `notebook_id` is copied onto each chunk so security and search need no join                               |
+| `notes`     | the user's notes             | plain text, title plus content                                                                                                                                                                                              |
 
 The search itself is a SQL function, [match_chunks](supabase/migrations/20261028150000_init.sql#L91-L109): cosine similarity, limited to the given Notebook and the ticked Sources. It runs with the caller's rights, so RLS still applies.
 
@@ -92,22 +93,18 @@ Like the real app, the notebook shows a title, a summary and three clickable que
 
 ## Decisions and why
 
-| Decision | Why | Alternative I rejected |
-| --- | --- | --- |
-| **RAG with pgvector**, not "send everything to Claude" ([ADR 0001](docs/adr/0001-rag-with-pgvector-via-openrouter.md)) | The company uses Supabase, and a real retrieval pipeline shows how it works. | Full-context answers would be simpler at this size. |
-| **One OpenRouter key** for chat and embeddings | Anthropic has no embedding model; one key means one place to configure. | Anthropic plus a second provider. |
-| **Small LangGraph**, two nodes | Retrieval and generation are separate steps that can grow (rerank, tools). | A plain function would do today. |
-| **NDJSON over `fetch`** for streaming | Simple, works with `POST`, no extra library. | Server-sent events (GET only), WebSockets. |
-| **The model may apply the Sources, not only quote them** | A strict "answer only from the excerpts" rule made it refuse any use case the Sources do not spell out. Now it reasons with them and labels what goes beyond them. | A strict quote-only prompt. |
-| **Prompt-based citations** | OpenRouter has no native citations feature. | Provider citation APIs. |
-| **Store extracted text, not the file** | Chat only needs text; no file storage to secure. | Supabase Storage. |
-| **Ingestion inside the request** (60 s limit) | No queue or worker to run; fine for the size limits. | Background job queue. |
-| **Chunk size by characters ÷ 4** | No tokenizer dependency. | Exact token counting. |
-| **Plain vector search**, top 8 | Good enough; easy to explain. | Hybrid search, reranking. |
-| **Guide cached by Source ids** | Cheap: a model call only when the Sources really change. | Regenerate on every load. |
-| **Row Level Security** | The database enforces ownership even if a route has a bug. | Checking `user_id` in every query. |
-| **One Notebook per user** | The task is about Sources, Notes and Chat, not a Notebook list. | A Notebook list page. |
-| **Websites and YouTube links left out** | Server-side fetching needs a strong SSRF guard, and YouTube often blocks server addresses, so it would be fragile in a demo. The branch `feat/web-youtube-sources` (closed PR #14) is kept. | Shipping it half-working. |
+
+| Decision                                                                                                               | Why                                                                                                                                                                                         | Alternative I rejected                              |
+| ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **RAG with pgvector**, not "send everything to Claude" ([ADR 0001](docs/adr/0001-rag-with-pgvector-via-openrouter.md)) | The company uses Supabase, and a real retrieval pipeline shows how it works.                                                                                                                | Full-context answers would be simpler at this size. |
+| **One OpenRouter key** for chat and embeddings                                                                         | Anthropic has no embedding model; one key means one place to configure.                                                                                                                     | Anthropic plus a second provider.                   |
+| **Small LangGraph**, two nodes                                                                                         | Retrieval and generation are separate steps that can grow (rerank, tools).                                                                                                                  | A plain function would do today.                    |
+| **The model may apply the Sources, not only quote them**                                                               | A strict "answer only from the excerpts" rule made it refuse any use case the Sources do not spell out. Now it reasons with them and labels what goes beyond them.                          | A strict quote-only prompt.                         |
+| **Store extracted text, not the file**                                                                                 | Chat only needs text; no file storage to secure.                                                                                                                                            | Supabase Storage.                                   |
+| **Guide cached by Source ids**                                                                                         | Cheap: a model call only when the Sources really change.                                                                                                                                    | Regenerate on every load.                           |
+| **Row Level Security**                                                                                                 | The database enforces ownership even if a route has a bug.                                                                                                                                  | Checking `user_id` in every query.                  |
+| **One Notebook per user**                                                                                              | The task is about Sources, Notes and Chat, not a Notebook list.                                                                                                                             | A Notebook list page.                               |
+| **Websites and YouTube links left out**                                                                                | Server-side fetching needs a strong SSRF guard, and YouTube often blocks server addresses, so it would be fragile in a demo. The branch `feat/web-youtube-sources` (closed PR #14) is kept. | Shipping it half-working.                           |
 
 ## Known limits
 

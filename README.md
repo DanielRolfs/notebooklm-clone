@@ -20,6 +20,7 @@ Stack: Next.js 16 (App Router, TypeScript, Tailwind), Supabase (Google login, Po
 ## Scope
 
 **Built**
+
 - Google login (Supabase Auth), one Notebook per user
 - Add sources: file upload (PDF, txt, md; drag and drop) and copied text; 50 Sources and 10 MB per file
 - Retrieval-augmented chat with streamed answers, citations and follow-up questions
@@ -27,23 +28,23 @@ Stack: Next.js 16 (App Router, TypeScript, Tailwind), Supabase (Google login, Po
 - Notes: create, rename, remove, edit with autosave
 - A public start page and a layout modelled on the original
 
-**Left out on purpose** (shown grayed out with a tooltip): web search, websites and YouTube links, Google Drive, Play Books, audio and video overviews and the other Studio tools, saving an answer as a note, text styling and export in notes, sharing and settings. The website and YouTube import was built and then dropped (see the decision in [TECHNICAL.md](TECHNICAL.md#decisions-and-why)).
+**Left out on purpose** (shown grayed out with a tooltip): web search, websites and YouTube links, Google Drive, Play Books, audio and video overviews and the other Studio tools, saving an answer as a note, text styling and export in notes, sharing and settings.
 
 ## Time spent
 
-The first three rows are the steps and estimates from my [initial analysis](initialAnalysis.md#procedure).
 
-| Step | Time |
-| --- | --- |
-| 1. Test NotebookLM | 10 min |
-| 2. Identify key features | 30 min |
-| 3. Improve the initial analysis | 5 min |
-| 4. Grill with Docs (Matt Pocock skill) | 30 min |
-| 5. Build, review and deploy with AI agents | about 2 h 30 min |
-| 6. Test and fix | about 1 h 15 min |
-| **Total** | **about 5 h** |
+| Step                                       | Time          |
+| -------------------------------------------- | --------------- |
+| 1. Test NotebookLM                         | 10 min        |
+| 2. Identify key features                   | 30 min        |
+| 3. Improve the initial analysis            | 5 min         |
+| 4. Grill with Docs (Matt Pocock skill)     | 30 min        |
+| 5. Build, review and deploy with AI agents | 2 h 30 min    |
+| 6. Test and fix                            | 1 h 15 min    |
+| 7. Review Readme & Final tests             | 30 min        |
+| **Total**                                  | **about 5 h** |
 
-Step 5 is wall-clock time from the first commit of the build (15:19) to the last feature merge (about 17:20) plus writing these docs. A manager session handed out the work, subagents built the branches in parallel, and I tested every pull request on its Vercel preview before it was merged: 15 pull requests (this documentation one included), 14 merged and one closed (website and YouTube import). My own hands-on time was lower, because the agents worked while I tested.
+Step 5 is wall-clock time from the first commit of the build (15:19) to the last feature merge (about 17:20) plus writing these docs. A manager session handed out the work, subagents built the branches in parallel, and I tested every pull request on its Vercel preview before it was merged: 15 pull requests (this documentation one included), 14 merged and one closed (website and YouTube import).
 
 Step 6 is wall-clock time from the README update that added step 5 (17:28) to the end of the match-the-screenshots pass (about 18:45). It covers the UI parity and font fixes, the responsive panels, the Playwright tests (logged-out, signed-in and layout) and a click-through of the whole app against the six screenshots. That pass added the missing controls, for example the title, search box, Play Books and Drive chips in the Add sources popover, the grayed-out Export to Docs item, the Drive hint above the chat box, and the emoji above the guide title.
 
@@ -59,12 +60,13 @@ Step 6 is wall-clock time from the README update that added step 5 (17:28) to th
 
 `.env.local` stays on your machine and is git-ignored. `.env.example` is the template and lists where to find each value.
 
-| Variable | Where to get it | Secret |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase: Project Settings, API | No |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase: Project Settings, API Keys (publishable / anon) | No |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase: Project Settings, API Keys (secret / service_role) | Yes, server only |
-| `OPENROUTER_API_KEY` | openrouter.ai, Keys (add a few dollars of credit) | Yes, server only |
+
+| Variable                               | Where to get it                                              | Secret           |
+| ---------------------------------------- | -------------------------------------------------------------- | ------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Supabase: Project Settings, API                              | No               |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase: Project Settings, API Keys (publishable / anon)    | No               |
+| `SUPABASE_SERVICE_ROLE_KEY`            | Supabase: Project Settings, API Keys (secret / service_role) | Yes, server only |
+| `OPENROUTER_API_KEY`                   | openrouter.ai, Keys (add a few dollars of credit)            | Yes, server only |
 
 Google login also needs an OAuth client from Google Cloud Console. Use the callback URL shown under Supabase, Authentication, Providers, Google, then paste the client ID and secret there.
 
